@@ -1957,3 +1957,195 @@ function outingTrainingUI() {
       renderAll();
     };
 }
+
+function learnUI() {
+    showModal(`<h3>在校集训</h3>
+      <label class="block">难度</label>
+      <select id="out-diff"><option value="1">基础班</option><option value="2">提高班</option><option value="3">冲刺班</option></select>
+      <label class="block">地点</label>
+      <div id="out-prov-grid" class="prov-grid"></div>
+      <label class="block">选择学生（点击卡片选择参加）</label>
+      <div id="out-student-grid" class="student-grid" style="max-height:180px;overflow:auto;border:1px solid #eee;padding:6px;margin-bottom:8px"></div>
+      
+      <div class="talent-inspire-panel collapsible collapsed" style="margin-top:12px;margin-bottom:12px;padding:10px;border:1px solid #e2e8f0;border-radius:6px;background:#f7fafc">
+        <h4 class="collapsible-head" style="margin:0;cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between">
+          <span>✨ 天赋激发</span>
+          <span class="collapse-arrow" style="font-size:12px;transition:transform 0.2s">▼</span>
+        </h4>
+        <div class="collapsible-content" style="margin-top:8px">
+          <div class="small muted" style="margin-bottom:8px">每选择一个激发天赋消耗 ¥12,000，参加集训的学生有 30% 概率获得该天赋</div>
+          <div id="out-talent-grid" class="talent-grid" style="max-height:200px;overflow:auto"></div>
+        </div>
+      </div>
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div>预计费用: <strong id="out-cost-preview">¥0</strong> <span id="out-talent-cost-text" style="font-size:12px;color:#666"></span></div>
+        <div style="font-size:12px;color:#666">费用与人数和声誉有关</div>
+      </div>
+      <div class="modal-actions" style="margin-top:8px">
+          <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+          <button class="btn" id="out-go">前往</button>
+        </div>`);
+    const outGrid = document.getElementById('out-prov-grid');
+    Object.keys(PROVINCES).forEach(k => {
+      const p = PROVINCES[k];
+      const btn = document.createElement('button');
+      btn.className = 'prov-btn';
+      btn.textContent = p.name;
+      btn.dataset.val = k;
+      btn.onclick = () => {
+        document.querySelectorAll('#out-prov-grid .prov-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      };
+      outGrid.appendChild(btn);
+    });
+    if(outGrid.firstChild) outGrid.firstChild.classList.add('selected');
+    
+    const outTalentGrid = document.getElementById('out-talent-grid');
+    if(outTalentGrid && window.TalentManager){
+      const allTalents = window.TalentManager.getRegistered() || [];
+      allTalents.forEach(talentName => {
+        const info = window.TalentManager.getTalentInfo(talentName) || { name: talentName, description: '', color: '#2b6cb0' };
+        const card = document.createElement('div');
+        card.className = 'talent-card';
+        card.dataset.talent = talentName;
+        card.dataset.selected = '0';
+        card.style.cssText = 'cursor:pointer;opacity:0.5;transition:opacity 0.2s';
+        
+        const top = document.createElement('div');
+        const dot = document.createElement('span');
+        dot.className = 'color-dot';
+        dot.style.background = info.color || '#2b6cb0';
+        const title = document.createElement('span');
+        title.className = 'title';
+        title.textContent = talentName;
+        top.appendChild(dot);
+        top.appendChild(title);
+        
+        const desc = document.createElement('div');
+        desc.className = 'desc';
+        desc.textContent = info.description || '';
+        
+        card.appendChild(top);
+        card.appendChild(desc);
+        
+        card.onclick = () => {
+          if(card.dataset.selected === '1'){
+            card.dataset.selected = '0';
+            card.style.opacity = '0.5';
+          } else {
+            card.dataset.selected = '1';
+            card.style.opacity = '1.0';
+          }
+          updateOutingCostPreview();
+        };
+        
+        outTalentGrid.appendChild(card);
+      });
+    }
+    
+    const talentInspirePanel = document.querySelector('.talent-inspire-panel');
+    if(talentInspirePanel){
+      const head = talentInspirePanel.querySelector('.collapsible-head');
+      const arrow = head.querySelector('.collapse-arrow');
+      head.onclick = () => {
+        talentInspirePanel.classList.toggle('collapsed');
+        if(talentInspirePanel.classList.contains('collapsed')){
+          arrow.style.transform = 'rotate(0deg)';
+        } else {
+          arrow.style.transform = 'rotate(180deg)';
+        }
+      };
+    }
+    
+    const outStudentGrid = document.getElementById('out-student-grid');
+    const activeStudents = game.students.filter(s=>s && s.active);
+    activeStudents.forEach(s => {
+      // 获取学生的晋级状态
+      const qualificationInfo = getStudentQualificationStatus(s);
+      
+      const card = document.createElement('div');
+      card.className = 'student-card';
+      card.style.cssText = 'display:inline-block;padding:6px;margin:4px;border:1px solid #ddd;border-radius:6px;cursor:pointer;min-width:120px;text-align:left;font-size:13px;opacity:0.45';
+      card.dataset.name = s.name;
+      card.dataset.selected = '0';
+      let talentsHtml = '';
+      if(s.talents && s.talents.size > 0){
+        const talentArray = Array.from(s.talents);
+        talentsHtml = talentArray.map(talentName => {
+          const talentInfo = window.TalentManager ? window.TalentManager.getTalentInfo(talentName) : { name: talentName, description: '暂无描述', color: '#2b6cb0' };
+          return `<span class="talent-tag" data-talent="${talentName}" style="background-color: ${talentInfo.color}20; color: ${talentInfo.color}; border-color: ${talentInfo.color}40;">
+          ${talentName}
+          <span class="talent-tooltip">${talentInfo.description}</span>
+        </span>`;
+        }).join('');
+      }
+      card.innerHTML = `<strong style="display:block">${s.name} ${qualificationInfo.html}</strong>
+        <div style="color:#666;margin-top:4px">
+          <span style="font-size:12px;color:#718096;font-weight:600;">知识</span>
+          <div class="knowledge-badges">
+            <span class="kb" title="数据结构: ${Math.floor(Number(s.knowledge_ds||0))}" data-grade="${getLetterGradeAbility(Math.floor(Number(s.knowledge_ds||0)))}">
+              DS ${getLetterGradeAbility(Math.floor(Number(s.knowledge_ds||0)))}
+            </span>
+            <span class="kb" title="图论: ${Math.floor(Number(s.knowledge_graph||0))}" data-grade="${getLetterGradeAbility(Math.floor(Number(s.knowledge_graph||0)))}">
+              图论 ${getLetterGradeAbility(Math.floor(Number(s.knowledge_graph||0)))}
+            </span>
+            <span class="kb" title="字符串: ${Math.floor(Number(s.knowledge_string||0))}" data-grade="${getLetterGradeAbility(Math.floor(Number(s.knowledge_string||0)))}">
+              字符串${getLetterGradeAbility(Math.floor(Number(s.knowledge_string||0)))}
+            </span>
+            <span class="kb" title="数学: ${Math.floor(Number(s.knowledge_math||0))}" data-grade="${getLetterGradeAbility(Math.floor(Number(s.knowledge_math||0)))}">
+              数学 ${getLetterGradeAbility(Math.floor(Number(s.knowledge_math||0)))}
+            </span>
+            <span class="kb" title="动态规划: ${Math.floor(Number(s.knowledge_dp||0))}" data-grade="${getLetterGradeAbility(Math.floor(Number(s.knowledge_dp||0)))}">
+              DP ${getLetterGradeAbility(Math.floor(Number(s.knowledge_dp||0)))}
+            </span>
+            <span class="kb ability" title="思维: ${Math.floor(Number(s.thinking||0))}" data-grade="${getLetterGradeAbility(Math.floor(Number(s.thinking||0)))}">思维${getLetterGradeAbility(Math.floor(Number(s.thinking||0)))}</span>
+            <span class="kb ability" title="代码: ${Math.floor(Number(s.coding||0))}" data-grade="${getLetterGradeAbility(Math.floor(Number(s.coding||0)))}">代码${getLetterGradeAbility(Math.floor(Number(s.coding||0)))}</span>
+          </div>
+        </div>
+        ${talentsHtml ? `<div style="display:flex;align-items:center;gap:6px;margin-top:6px;"><span style="font-size:12px;color:#718096;font-weight:600;">天赋</span><div class="student-talents">${talentsHtml}</div></div>` : ''}
+      `;
+      card.onclick = () => {
+        if(card.dataset.selected === '1'){ card.dataset.selected = '0'; card.style.opacity = '0.45'; }
+        else { card.dataset.selected = '1'; card.style.opacity = '1.0'; }
+        updateOutingCostPreview();
+      };
+      outStudentGrid.appendChild(card);
+    });
+    function updateOutingCostPreview(){
+      const selectedCount = Array.from(document.querySelectorAll('#out-student-grid .student-card')).filter(c=>c.dataset.selected==='1').length || 0;
+      const d = parseInt($('out-diff').value);
+      const p = parseInt(document.querySelector('#out-prov-grid .prov-btn.selected').dataset.val);
+      const baseCost = computeOutingCostQuadratic(d, p, selectedCount);
+      
+      const selectedTalents = Array.from(document.querySelectorAll('#out-talent-grid .talent-card')).filter(c=>c.dataset.selected==='1').length || 0;
+      const talentCost = selectedTalents * 12000;
+      const totalCost = baseCost + talentCost;
+      
+      document.getElementById('out-cost-preview').textContent = `¥${totalCost}`;
+      const talentCostText = document.getElementById('out-talent-cost-text');
+      if(talentCostText){
+        if(selectedTalents > 0){
+          talentCostText.textContent = `(含天赋激发 ¥${talentCost})`;
+        } else {
+          talentCostText.textContent = '';
+        }
+      }
+    }
+    document.getElementById('out-diff').onchange = updateOutingCostPreview;
+    Array.from(document.querySelectorAll('#out-prov-grid .prov-btn')).forEach(b => { b.onclick = (ev) => { document.querySelectorAll('#out-prov-grid .prov-btn').forEach(bb => bb.classList.remove('selected')); b.classList.add('selected'); updateOutingCostPreview(); }; });
+    updateOutingCostPreview();
+    $('out-go').onclick = () => {
+      const d = parseInt($('out-diff').value);
+      const p = parseInt(document.querySelector('#out-prov-grid .prov-btn.selected').dataset.val);
+      const selectedNames = Array.from(document.querySelectorAll('#out-student-grid .student-card')).filter(c=>c.dataset.selected==='1').map(c=>c.dataset.name);
+      if(!selectedNames || selectedNames.length === 0){ alert('请至少选择一名学生参加集训！'); return; }
+      
+      const selectedTalents = Array.from(document.querySelectorAll('#out-talent-grid .talent-card')).filter(c=>c.dataset.selected==='1').map(c=>c.dataset.talent);
+      
+      closeModal();
+      outingTrainingWithSelection(d, p, selectedNames, selectedTalents);
+      safeWeeklyUpdate(1);
+      renderAll();
+    };
+}
