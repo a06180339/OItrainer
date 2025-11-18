@@ -50,7 +50,53 @@ function scaledPassCount(n){
   return Math.max(1, Math.floor(Math.sqrt(n)));
 }
 
+function schoolCampTraining(diff, studentNames, selectedTalents) {
+  // 校内集训费用比外出便宜非常多
+  const cost = studentNames.length * diff * 1000 + selectedTalents.length * 4000;
+  game.money -= cost;
 
+  studentNames.forEach(name => {
+    const s = game.students.find(x => x.name === name);
+    if (!s) return;
+
+    /* 
+      校内集训特性：
+      - 提升幅度约为外出集训的 40%~55%
+      - 强度越高，负面影响越大
+      - 封闭训练 → 压力显著上升
+    */
+    
+    const gain = diff * 0.9;        // 训练效果（较低）
+    const mentalGain = diff * 0.4;  // 思维/代码提升（更低）
+    const stress = diff * 6;        // 压力明显增加
+    const comfortLoss = diff * 3;   // 舒适度下降
+
+    // 知识类提升
+    s.knowledge_ds     += gain;
+    s.knowledge_graph  += gain;
+    s.knowledge_math   += gain;
+    s.knowledge_dp     += gain;
+    s.knowledge_string += gain;
+
+    // 基础能力
+    s.thinking += mentalGain;
+    s.coding   += mentalGain;
+
+    // 负面效果
+    s.stress = (s.stress || 0) + stress;
+    game.comfort -= comfortLoss;
+
+    // 天赋激发（学校水平低 → 仅 20%）
+    selectedTalents.forEach(t => {
+      if (Math.random() < 0.2) {
+        if (!s.talents) s.talents = new Set();
+        s.talents.add(t);
+      }
+    });
+  });
+
+  pushLog(`学校进行了 ${studentNames.length} 人的校内封闭集训。训练效果有限，但压力上升明显。费用 ¥${cost}.`);
+}
 
 // ===== 状态快照与差异汇总工具 =====
 function __createSnapshot(){
