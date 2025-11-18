@@ -51,51 +51,97 @@ function scaledPassCount(n){
 }
 
 function schoolCampTraining(diff, studentNames, selectedTalents) {
-  // 校内集训费用比外出便宜非常多
-  const cost = studentNames.length * diff * 1000 + selectedTalents.length * 4000;
-  game.money -= cost;
+  // diff: 1(低) / 2(中) / 3(高)
+  studentNames = studentNames || [];
+  selectedTalents = selectedTalents || [];
 
-  studentNames.forEach(name => {
-    const s = game.students.find(x => x.name === name);
-    if (!s) return;
+  // 成本（校内便宜）：按学生×强度 + 天赋激发费用
+  const perStudentBase = 1000; // 每名学生基准成本
+  const talentInspireUnit = 4000; // 单个天赋激发费用（校内）
+  const cost = Math.max(0, studentNames.length * diff * perStudentBase + selectedTalents.length * talentInspireUnit);
 
-    /* 
-      校内集训特性：
-      - 提升幅度约为外出集训的 40%~55%
-      - 强度越高，负面影响越大
-      - 封闭训练 → 压力显著上升
-    */
-    
-    const gain = diff * 0.9;        // 训练效果（较低）
-    const mentalGain = diff * 0.4;  // 思维/代码提升（更低）
-    const stress = diff * 6;        // 压力明显增加
-    const comfortLoss = diff * 3;   // 舒适度下降
+  // 先校验经费并记录
+  if (typeof game === 'undefined' || !game) {
+    console.error('game 未定义，无法执行校内集训');
+    return;
+  }
+  if (typeof game.recordExpense === 'function') {
+    if (game.budget < cost) {
+      alert('经费不足，无法组织校内集训！');
+      return;
+    }
+    game.recordExpense(cost, `校内集训（${studentNames.length}人，强度${diff}）`);
+  } else {
+    // 兜底：直接修改 budget（如果 recordExpense 不存在）
+    game.budget = (Number(game.budget) || 0) - cost;
+  }
 
-    // 知识类提升
-    s.knowledge_ds     += gain;
-    s.knowledge_graph  += gain;
-    s.knowledge_math   += gain;
-    s.knowledge_dp     += gain;
-    s.knowledge_string += gain;
+  // 参数到内部数值映射（校内集训：效果弱，压力高）
+  // gain：知识类提升（比外出低很多）
+  // abilityGain：思维/编程等能力提升（更低）
+  // pressureInc：压力增加（明显）
+  // comfortLoss：学生舒适度下降（封闭训练带来的不适）
+  const gain = diff * 0.6;         // 知识提升基准（低）
+  const abilityGain = diff * 0.35; // 能力提升（更低）
+  const pressureInc = diff * 8;    // 压力明显增加
+  const comfortLoss = diff * 4;    // 舒适度下降
 
-    // 基础能力
-    s.thinking += mentalGain;
-    s.coding   += mentalGain;
+  const beforeSnap = typeof __createSnapshot === 'function' ? __createSnapshot() : null;
 
-    // 负面效果
-    s.stress = (s.stress || 0) + stress;
-    game.comfort -= comfortLoss;
+  for (const name of studentNames) {
+    const s = game.students.find(x => x && x.name === name);
+    if (!s) continue;
 
-    // 天赋激发（学校水平低 → 仅 20%）
-    selectedTalents.forEach(t => {
-      if (Math.random() < 0.2) {
+    // 知识点增长（五大知识）
+    s.knowledge_ds     = (s.knowledge_ds || 0) + gain;
+    s.knowledge_graph  = (s.knowledge_graph || 0) + gain;
+    s.knowledge_string = (s.knowledge_string || 0) + gain;
+    s.knowledge_math   = (s.knowledge_math || 0) + gain;
+    s.knowledge_dp     = (s.knowledge_dp || 0) + gain;
+
+    // 基础能力提升
+    s.thinking = (s.thinking || 0) + abilityGain;
+    s.coding   = (s.coding   || 0) + abilityGain;
+
+    // 舒适度/压力调整（使用项目通用字段）
+    s.comfort = Math.max(0, (typeof s.comfort === 'number' ? s.comfort : game.getComfort ? game.getComfort() : 50) - comfortLoss);
+    s.pressure = Math.min(100, Number(s.pressure || 0) + pressureInc);
+
+    // 天赋激发（校内：概率较低，设为20%）
+    for (const t of selectedTalents) {
+      if (Math.random() < 0.20) {
         if (!s.talents) s.talents = new Set();
         s.talents.add(t);
+        // 触发事件记录
+        try {
+          pushEvent && pushEvent({ name: '天赋激发成功', description: `${s.name} 在校内集训中获得了天赋「${t}」`, week: game.week });
+        } catch (e) {}
       }
-    });
-  });
+    }
 
-  pushLog(`学校进行了 ${studentNames.length} 人的校内封闭集训。训练效果有限，但压力上升明显。费用 ¥${cost}.`);
+    // 触发相关天赋hook（如果存在）
+    try { if (typeof s.triggerTalents === 'function') s.triggerTalents('schoolcamp_finished', { diff, costPerStudent: perStudentBase }); } catch(e){ console.error('triggerTalents schoolcamp_finished', e); }
+  }
+
+  // 全局效果：降低团队舒适度（可选，项目没有全局comfort字段时无害）
+  try {
+    if (typeof game.adjustComfort === 'function') {
+      game.adjustComfort(-Math.round(comfortLoss * Math.max(1, studentNames.length/3)));
+    } else if (typeof game.comfort === 'number') {
+      game.comfort = Math.max(0, game.comfort - Math.round(comfortLoss * Math.max(1, studentNames.length/3)));
+    }
+  } catch (e) {}
+
+  // 日志与事件
+  try {
+    log && log(`校内集训：${studentNames.length} 人参加，强度 ${diff}，费用 ¥${cost}。训练效果有限但压力上升。`);
+    pushEvent && pushEvent({ name: '校内集训完成', description: `本次校内集训 ${studentNames.length} 人参加，消耗 ¥${cost}，学生压力上升。`, week: game.week });
+  } catch (e) {}
+
+  const afterSnap = typeof __createSnapshot === 'function' ? __createSnapshot() : null;
+  if (beforeSnap && afterSnap && typeof __summarizeSnapshot === 'function') {
+    __summarizeSnapshot(beforeSnap, afterSnap, `校内集训（强度${diff}）`);
+  }
 }
 
 // ===== 状态快照与差异汇总工具 =====
