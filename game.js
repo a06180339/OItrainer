@@ -1447,6 +1447,7 @@ window.onload = ()=>{
     document.getElementById('action-mock').onclick = ()=>{ holdMockContestUI(); };
     document.getElementById('action-outing').onclick = ()=>{ outingTrainingUI(); };
     document.getElementById('action-resign').onclick = ()=>{ resignUI(); };
+    document.getElementById('action-learn').onclick = ()=>{ learnUI(); };
     
     document.querySelectorAll('.btn.upgrade').forEach(b => {
       b.onclick = (e) => {
