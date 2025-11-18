@@ -1961,9 +1961,7 @@ function outingTrainingUI() {
 function learnUI() {
     showModal(`<h3>在校集训</h3>
       <label class="block">难度</label>
-      <select id="out-diff"><option value="1">基础班</option><option value="2">提高班</option><option value="3">冲刺班</option></select>
-      <label class="block">地点</label>
-      <div id="out-prov-grid" class="prov-grid"></div>
+      <select id="out-diff"><option value="1">简单</option><option value="2">中等</option><option value="3">困难</option></select>
       <label class="block">选择学生（点击卡片选择参加）</label>
       <div id="out-student-grid" class="student-grid" style="max-height:180px;overflow:auto;border:1px solid #eee;padding:6px;margin-bottom:8px"></div>
       
@@ -1980,11 +1978,10 @@ function learnUI() {
       
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
         <div>预计费用: <strong id="out-cost-preview">¥0</strong> <span id="out-talent-cost-text" style="font-size:12px;color:#666"></span></div>
-        <div style="font-size:12px;color:#666">费用与人数和声誉有关</div>
       </div>
       <div class="modal-actions" style="margin-top:8px">
           <button class="btn btn-ghost" onclick="closeModal()">取消</button>
-          <button class="btn" id="out-go">前往</button>
+          <button class="btn" id="out-go">开始</button>
         </div>`);
     const outGrid = document.getElementById('out-prov-grid');
     Object.keys(PROVINCES).forEach(k => {
