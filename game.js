@@ -50,6 +50,8 @@ function scaledPassCount(n){
   return Math.max(1, Math.floor(Math.sqrt(n)));
 }
 
+
+
 // ===== 状态快照与差异汇总工具 =====
 function __createSnapshot(){
   return {
