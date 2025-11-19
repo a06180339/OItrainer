@@ -57,8 +57,8 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
 
   // 成本（校内便宜）：按学生×强度 + 天赋激发费用
   const perStudentBase = 1000; // 每名学生基准成本
-  const talentInspireUnit = 4000; // 单个天赋激发费用（校内）
-  const cost = Math.max(0, studentNames.length * diff * perStudentBase + selectedTalents.length * talentInspireUnit);
+  const talentInspireUnit = 10000; // 单个天赋激发费用（校内）
+  const cost = Math.max(0, 30000 + studentNames.length * diff * perStudentBase + selectedTalents.length * talentInspireUnit);
 
   // 先校验经费并记录
   if (typeof game === 'undefined' || !game) {
@@ -84,7 +84,7 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
   const gain = diff * 0.6;         // 知识提升基准（低）
   const abilityGain = diff * 0.35; // 能力提升（更低）
   const pressureInc = diff * 8;    // 压力明显增加
-  const comfortLoss = diff * 4;    // 舒适度下降
+  const comfortLoss = diff * 3;    // 舒适度下降
 
   const beforeSnap = typeof __createSnapshot === 'function' ? __createSnapshot() : null;
 
@@ -109,7 +109,7 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
 
     // 天赋激发（校内：概率较低，设为20%）
     for (const t of selectedTalents) {
-      if (Math.random() < 0.20) {
+      if (Math.random() < 0.2) {
         if (!s.talents) s.talents = new Set();
         s.talents.add(t);
         // 触发事件记录
