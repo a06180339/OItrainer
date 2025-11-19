@@ -1979,7 +1979,7 @@ function learnUI() {
         <span class="collapse-arrow" style="font-size:12px;transition:transform 0.2s">▼</span>
       </h4>
       <div class="collapsible-content" style="margin-top:8px">
-        <div class="small muted" style="margin-bottom:8px">每选择一个激发天赋消耗 ¥4,000，参加集训的学生有 30% 概率获得该天赋</div>
+        <div class="small muted" style="margin-bottom:8px">每选择一个激发天赋消耗 ¥10,000，参加集训的学生有 15% 概率获得该天赋</div>
         <div id="camp-talent-grid" class="talent-grid" style="max-height:200px;overflow:auto"></div>
       </div>
     </div>
@@ -2082,9 +2082,9 @@ function learnUI() {
         .filter(c => c.dataset.selected === "1").length;
 
     // 校内集训费用更低
-    const baseCost = selectedStudents * diff * 1500;
-    const talentCost = selectedTalents * 4000;
-    const total = baseCost + talentCost;
+    const baseCost = selectedStudents * diff * 10000;
+    const talentCost = selectedTalents * 10000;
+    const total = 40000 + baseCost + talentCost;
 
     document.getElementById("camp-cost-preview").textContent = `¥${total}`;
   }
