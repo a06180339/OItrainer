@@ -81,7 +81,7 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
   // abilityGain：思维/编程等能力提升（更低）
   // pressureInc：压力增加（明显）
   // comfortLoss：学生舒适度下降（封闭训练带来的不适）
-  const gain = diff * 2;         // 知识提升基准（低）
+  const gain = diff * 20;         // 知识提升基准（低）
   const abilityGain = diff * 0.35; // 能力提升（更低）
   const pressureInc = diff * 15;    // 压力明显增加
   const comfortLoss = diff * 3;    // 舒适度下降
