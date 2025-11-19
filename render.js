@@ -2029,18 +2029,6 @@ function learnUI() {
     </div>
   </div>
 
-  <div style="color:#666;margin-top:4px">
-    <span style="font-size:12px;color:#718096;font-weight:600;">能力</span>
-    <div class="ability-badges">
-      <span class="kb ability" title="思维: ${Math.floor(s.thinking || 0)}" data-grade="${getLetterGradeAbility(Math.floor(s.thinking || 0))}">
-        思维 ${getLetterGradeAbility(Math.floor(s.thinking || 0))}
-      </span>
-      <span class="kb ability" title="代码: ${Math.floor(s.coding || 0)}" data-grade="${getLetterGradeAbility(Math.floor(s.coding || 0))}">
-        代码 ${getLetterGradeAbility(Math.floor(s.coding || 0))}
-      </span>
-    </div>
-  </div>
-
   <!--学生已有天赋-->
   ${
     (s.talents && s.talents.size)
