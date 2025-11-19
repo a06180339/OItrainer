@@ -2120,7 +2120,7 @@ function learnUI() {
         .filter(c => c.dataset.selected === "1").length;
 
     // 校内集训费用更低
-    const baseCost = selectedStudents * diff * 10000;
+    const baseCost = selectedStudents * (diff / 2.5) * 10000;
     const talentCost = selectedTalents * 6000;
     const total = 10000 + baseCost + talentCost;
 
