@@ -2005,10 +2005,60 @@ function learnUI() {
     card.dataset.selected = "0";
     card.style.cssText = "display:inline-block;padding:6px;margin:4px;border:1px solid #ddd;border-radius:6px;cursor:pointer;min-width:120px;text-align:left;font-size:13px;opacity:0.45";
 
-    card.innerHTML = `<strong>${s.name}</strong>
-      <div style="color:#666;margin-top:4px;font-size:12px">
-        综合能力：${Math.floor((s.thinking + s.coding) / 2)}
-      </div>`;
+    card.innerHTML = `
+  <strong style="display:block">${s.name}</strong>
+
+  <div style="color:#666;margin-top:4px">
+    <span style="font-size:12px;color:#718096;font-weight:600;">知识</span>
+    <div class="knowledge-badges">
+      <span class="kb" title="数据结构: ${Math.floor(s.knowledge_ds || 0)}" data-grade="${getLetterGradeAbility(Math.floor(s.knowledge_ds || 0))}">
+        DS ${getLetterGradeAbility(Math.floor(s.knowledge_ds || 0))}
+      </span>
+      <span class="kb" title="图论: ${Math.floor(s.knowledge_graph || 0)}" data-grade="${getLetterGradeAbility(Math.floor(s.knowledge_graph || 0))}">
+        图论 ${getLetterGradeAbility(Math.floor(s.knowledge_graph || 0))}
+      </span>
+      <span class="kb" title="字符串: ${Math.floor(s.knowledge_string || 0)}" data-grade="${getLetterGradeAbility(Math.floor(s.knowledge_string || 0))}">
+        字符串 ${getLetterGradeAbility(Math.floor(s.knowledge_string || 0))}
+      </span>
+      <span class="kb" title="数学: ${Math.floor(s.knowledge_math || 0)}" data-grade="${getLetterGradeAbility(Math.floor(s.knowledge_math || 0))}">
+        数学 ${getLetterGradeAbility(Math.floor(s.knowledge_math || 0))}
+      </span>
+      <span class="kb" title="DP: ${Math.floor(s.knowledge_dp || 0)}" data-grade="${getLetterGradeAbility(Math.floor(s.knowledge_dp || 0))}">
+        DP ${getLetterGradeAbility(Math.floor(s.knowledge_dp || 0))}
+      </span>
+    </div>
+  </div>
+
+  <div style="color:#666;margin-top:4px">
+    <span style="font-size:12px;color:#718096;font-weight:600;">能力</span>
+    <div class="ability-badges">
+      <span class="kb ability" title="思维: ${Math.floor(s.thinking || 0)}" data-grade="${getLetterGradeAbility(Math.floor(s.thinking || 0))}">
+        思维 ${getLetterGradeAbility(Math.floor(s.thinking || 0))}
+      </span>
+      <span class="kb ability" title="代码: ${Math.floor(s.coding || 0)}" data-grade="${getLetterGradeAbility(Math.floor(s.coding || 0))}">
+        代码 ${getLetterGradeAbility(Math.floor(s.coding || 0))}
+      </span>
+    </div>
+  </div>
+
+  <!--学生已有天赋-->
+  ${
+    (s.talents && s.talents.size)
+      ? `<div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
+            <span style="font-size:12px;color:#718096;font-weight:600;">天赋</span>
+            <div class="student-talents">
+              ${Array.from(s.talents).map(t => {
+                const info = TalentManager.getTalentInfo(t) || {color:"#2b6cb0"};
+                return `
+                  <span class="talent-tag" style="background-color:${info.color}20;color:${info.color};border-color:${info.color}40;">
+                    ${t}
+                  </span>`;
+              }).join("")}
+            </div>
+        </div>`
+      : ""
+  }
+`;
 
     card.onclick = () => {
       if (card.dataset.selected === "1") {
