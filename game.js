@@ -81,7 +81,7 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
   // abilityGain：思维/编程等能力提升（更低）
   // pressureInc：压力增加（明显）
   // comfortLoss：学生舒适度下降（封闭训练带来的不适）
-  const gain = diff * 0.6;         // 知识提升基准（低）
+  const gain = diff * 2;         // 知识提升基准（低）
   const abilityGain = diff * 0.35; // 能力提升（更低）
   const pressureInc = diff * 15;    // 压力明显增加
   const comfortLoss = diff * 3;    // 舒适度下降
@@ -93,11 +93,11 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
     if (!s) continue;
 
     // 知识点增长（五大知识）
-    s.knowledge_ds     = (s.knowledge_ds || 0) + gain;
-    s.knowledge_graph  = (s.knowledge_graph || 0) + gain;
-    s.knowledge_string = (s.knowledge_string || 0) + gain;
-    s.knowledge_math   = (s.knowledge_math || 0) + gain;
-    s.knowledge_dp     = (s.knowledge_dp || 0) + gain;
+    s.knowledge_ds     = (s.knowledge_ds || 0) + gain * Math.random();
+    s.knowledge_graph  = (s.knowledge_graph || 0) + gain * Math.random();
+    s.knowledge_string = (s.knowledge_string || 0) + gain * Math.random();
+    s.knowledge_math   = (s.knowledge_math || 0) + gain * Math.random();
+    s.knowledge_dp     = (s.knowledge_dp || 0) + gain * Math.random();
 
     // 基础能力提升
     s.thinking = (s.thinking || 0) + abilityGain;
@@ -109,7 +109,7 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
 
     // 天赋激发（校内：概率较低，设为20%）
     for (const t of selectedTalents) {
-      if (Math.random() < 0.2) {
+      if (Math.random() < 0.4) {
         if (!s.talents) s.talents = new Set();
         s.talents.add(t);
         // 触发事件记录
