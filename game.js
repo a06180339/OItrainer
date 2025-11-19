@@ -57,8 +57,8 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
 
   // 成本（校内便宜）：按学生×强度 + 天赋激发费用
   const perStudentBase = 10000; // 每名学生基准成本
-  const talentInspireUnit = 10000; // 单个天赋激发费用（校内）
-  const cost = Math.max(40000, 40000 + studentNames.length * (1 + (diff - 1) / 3) * perStudentBase + selectedTalents.length * talentInspireUnit);
+  const talentInspireUnit = 6000; // 单个天赋激发费用（校内）
+  const cost = Math.max(10000, 10000 + studentNames.length * (1 + (diff - 1) / 3) * perStudentBase + selectedTalents.length * talentInspireUnit);
 
   // 先校验经费并记录
   if (typeof game === 'undefined' || !game) {
