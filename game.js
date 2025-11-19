@@ -58,7 +58,7 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
   // 成本（校内便宜）：按学生×强度 + 天赋激发费用
   const perStudentBase = 10000; // 每名学生基准成本
   const talentInspireUnit = 6000; // 单个天赋激发费用（校内）
-  const cost = Math.max(10000, 10000 + studentNames.length * (1 + (diff - 1) / 3) * perStudentBase + selectedTalents.length * talentInspireUnit);
+  const cost = Math.max(10000, 10000 + studentNames.length * diff / 2.5 * perStudentBase + selectedTalents.length * talentInspireUnit);
 
   // 先校验经费并记录
   if (typeof game === 'undefined' || !game) {
@@ -83,7 +83,7 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
   // comfortLoss：学生舒适度下降（封闭训练带来的不适）
   const gain = diff * 0.6;         // 知识提升基准（低）
   const abilityGain = diff * 0.35; // 能力提升（更低）
-  const pressureInc = diff * 8;    // 压力明显增加
+  const pressureInc = diff * 15;    // 压力明显增加
   const comfortLoss = diff * 3;    // 舒适度下降
 
   const beforeSnap = typeof __createSnapshot === 'function' ? __createSnapshot() : null;
