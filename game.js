@@ -935,6 +935,14 @@ function weeklyUpdate(weeks=1){
     }
   }catch(e){ console.error('weeklyUpdate trigger talents failed', e); }
 
+  const active = game.students.filter(s => s && s.active).length;
+  const subsidy = active * 1000;
+  game.budget = (Number(game.budget) || 0) + subsidy;
+
+  try {
+    log(`每周补贴：${active} 名学生 × 1000 = ¥${subsidy}`);
+  } catch(e) {}
+
   checkRandomEvents();
   if (checkAndTriggerEnding()) {
     return;
