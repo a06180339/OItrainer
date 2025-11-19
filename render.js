@@ -2121,8 +2121,8 @@ function learnUI() {
 
     // 校内集训费用更低
     const baseCost = selectedStudents * diff * 10000;
-    const talentCost = selectedTalents * 10000;
-    const total = 40000 + baseCost + talentCost;
+    const talentCost = selectedTalents * 6000;
+    const total = 10000 + baseCost + talentCost;
 
     document.getElementById("camp-cost-preview").textContent = `¥${total}`;
   }
