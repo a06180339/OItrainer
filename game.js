@@ -418,11 +418,11 @@ function trainStudentsWithTask(task, intensity) {
     
     const libraryLevel = game.facilities.library;
     let libraryBonus = 0;
-    if(libraryLevel === 1) libraryBonus = -0.20;
-    else if(libraryLevel === 2) libraryBonus = -0.05;
+    if(libraryLevel === 1) libraryBonus = 0.00;
+    else if(libraryLevel === 2) libraryBonus = 0.05;
     else if(libraryLevel === 3) libraryBonus = 0.10;
-    else if(libraryLevel === 4) libraryBonus = 0.12;
-    else if(libraryLevel === 5) libraryBonus = 0.14;
+    else if(libraryLevel === 4) libraryBonus = 0.18;
+    else if(libraryLevel === 5) libraryBonus = 0.29;
     
     const libraryMultiplier = 1.0 + libraryBonus;
     
@@ -439,15 +439,15 @@ function trainStudentsWithTask(task, intensity) {
     
     const computerLevel = game.facilities.computer;
     let computerBonus = 0;
-    if(computerLevel === 1) computerBonus = -0.2;
-    else if(computerLevel === 2) computerBonus = 0;
+    if(computerLevel === 1) computerBonus = 0;
+    else if(computerLevel === 2) computerBonus = 0.05;
     else if(computerLevel === 3) computerBonus = 0.1;
     else if(computerLevel === 4) computerBonus = 0.2;
     else if(computerLevel === 5) computerBonus = 0.3;
     
     const computerMultiplier = 1.0 + computerBonus;
     
-    const abilityGainBase = boostMultiplier * intensityFactor * (1 - Math.min(0.6, s.pressure/200.0));
+    const abilityGainBase = boostMultiplier * intensityFactor;
     const thinkingGain = uniform(0.6, 1.5) * abilityGainBase * computerMultiplier * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
     const codingGain = uniform(1, 2.5) * abilityGainBase * computerMultiplier * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
     
