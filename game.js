@@ -18,6 +18,46 @@ const recentEvents = [];
 // 为每个事件生成唯一ID的计数器
 let _eventIdCounter = 0;
 
+function selfTraining() {
+  if (!game || !game.students) return;
+
+  const students = game.students.filter(s => s && s.active);
+  const gain = 10;         // 每项知识点提升（可以调）
+  const abilityGain = 8;  // 思维、代码提升
+  const pressureInc = 15;    // 自主训练压力增加
+  const comfortLoss = 1;    // 稍微掉一点舒适度
+
+  students.forEach(s => {
+    // 五大知识
+    s.knowledge_ds     = (s.knowledge_ds || 0) + gain * Math.random();
+    s.knowledge_graph  = (s.knowledge_graph || 0) + gain * Math.random();
+    s.knowledge_string = (s.knowledge_string || 0) + gain * Math.random();
+    s.knowledge_math   = (s.knowledge_math || 0) + gain * Math.random();
+    s.knowledge_dp     = (s.knowledge_dp || 0) + gain * Math.random();
+
+    // 思维/代码基础能力
+    s.thinking = (s.thinking || 0) + abilityGain * Math.random();
+    s.coding   = (s.coding   || 0) + abilityGain * Math.random();
+
+    // 压力 + 舒适度变化
+    s.pressure = Math.min(100, (s.pressure || 0) + pressureInc * Math.random());
+    s.comfort  = Math.max(0,   (s.comfort  || 50) - comfortLoss * Math.random());
+  });
+
+  // 日志事件
+  log(`自主训练：${students.length} 名学生参与，每项能力均有所提高。`);
+  pushEvent && pushEvent({
+    name: "自主训练完成",
+    description: `全体学生进行了自主训练，知识与能力全面提升。`,
+    week: game.week
+  });
+
+  // 一周推进
+  safeWeeklyUpdate(1);
+  renderAll();
+}
+
+
 function pushEvent(msg){
   const wkDefault = currWeek();
   const ev = (typeof msg === 'string') 
