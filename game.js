@@ -82,8 +82,8 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
   // pressureInc：压力增加（明显）
   // comfortLoss：学生舒适度下降（封闭训练带来的不适）
   const gain = diff * 20;         // 知识提升基准（低）
-  const abilityGain = diff * 0.35; // 能力提升（更低）
-  const pressureInc = diff * 15;    // 压力明显增加
+  const abilityGain = diff * 15; // 能力提升（更低）
+  const pressureInc = diff * 10;    // 压力明显增加
   const comfortLoss = diff * 3;    // 舒适度下降
 
   const beforeSnap = typeof __createSnapshot === 'function' ? __createSnapshot() : null;
@@ -109,7 +109,7 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
 
     // 天赋激发（校内：概率较低，设为20%）
     for (const t of selectedTalents) {
-      if (Math.random() < 0.4) {
+      if (Math.random() < 0.65) {
         if (!s.talents) s.talents = new Set();
         s.talents.add(t);
         // 触发事件记录
