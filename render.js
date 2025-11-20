@@ -9,6 +9,7 @@
  * @param {Student} student - 学生对象
  * @returns {Object} - { hasQualification: boolean, nextContest: string, html: string }
  */
+
 function getStudentQualificationStatus(student) {
   const result = {
     hasQualification: false,
@@ -2154,4 +2155,20 @@ function learnUI() {
     renderAll();
   };
 }
+
+function learn2UI() {
+  showModal(`
+    <h3>确认自主训练？</h3>
+    <p class="small muted" style="margin-top:6px;line-height:1.6">
+      全体学生将进行自主训练，每一项知识点都会小幅提升。<br>
+      自主训练效率较低，但能稳定提升基础，压力略微上升。
+    </p>
+
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn" onclick="closeModal(); selfTraining();">确认训练</button>
+    </div>
+  `);
+}
+
 
