@@ -149,7 +149,7 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
 
     // 天赋激发（校内：概率较低，设为20%）
     for (const t of selectedTalents) {
-      if (Math.random() < 0.65) {
+      if (Math.random() < 0.75) {
         if (!s.talents) s.talents = new Set();
         s.talents.add(t);
         // 触发事件记录
