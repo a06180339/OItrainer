@@ -1550,6 +1550,7 @@ window.onload = ()=>{
     document.getElementById('action-outing').onclick = ()=>{ outingTrainingUI(); };
     document.getElementById('action-resign').onclick = ()=>{ resignUI(); };
     document.getElementById('action-learn').onclick = ()=>{ learnUI(); };
+    document.getElementById('action-learn2').onclick = ()=>{ learn2UI(); };
     
     document.querySelectorAll('.btn.upgrade').forEach(b => {
       b.onclick = (e) => {
