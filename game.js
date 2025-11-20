@@ -23,7 +23,7 @@ function selfTraining() {
 
   const students = game.students.filter(s => s && s.active);
   const gain = 10;         // 每项知识点提升（可以调）
-  const abilityGain = 8;  // 思维、代码提升
+  const abilityGain = 5;  // 思维、代码提升
   const pressureInc = 15;    // 自主训练压力增加
   const comfortLoss = 1;    // 稍微掉一点舒适度
 
@@ -122,7 +122,7 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
   // pressureInc：压力增加（明显）
   // comfortLoss：学生舒适度下降（封闭训练带来的不适）
   const gain = diff * 20;         // 知识提升基准（低）
-  const abilityGain = diff * 15; // 能力提升（更低）
+  const abilityGain = diff * 5; // 能力提升（更低）
   const pressureInc = diff * 10;    // 压力明显增加
   const comfortLoss = diff * 3;    // 舒适度下降
 
