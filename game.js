@@ -23,8 +23,8 @@ function selfTraining() {
 
   const students = game.students.filter(s => s && s.active);
   const gain = 10;         // 每项知识点提升（可以调）
-  const abilityGain = 5;  // 思维、代码提升
-  const pressureInc = 15;    // 自主训练压力增加
+  const abilityGain = 3;  // 思维、代码提升
+  const pressureInc = 25;    // 自主训练压力增加
   const comfortLoss = 1;    // 稍微掉一点舒适度
 
   students.forEach(s => {
