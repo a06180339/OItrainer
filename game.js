@@ -27,6 +27,7 @@ function selfTraining() {
   const pressureInc = 25;    // 自主训练压力增加
   const comfortLoss = 1;    // 稍微掉一点舒适度
 
+  const libraryLevel = game.facilities.library;
   let libraryBonus = 0;
   if(libraryLevel === 1) libraryBonus = 0.00;
   else if(libraryLevel === 2) libraryBonus = 0.05;
