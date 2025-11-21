@@ -464,7 +464,7 @@ function renderAll(){
           ${qualificationInfo.html}
         </div>
         <div class="student-status">
-          <span class="label-pill ${pressureClass}">压力: ${Math.floor(Number(s.mental||0))}} (${pressureLevel})</span>
+          <span class="label-pill ${pressureClass}">压力: ${Math.floor(Number(s.mental||0))} (${pressureLevel})</span>
         </div>
       </div>
       
