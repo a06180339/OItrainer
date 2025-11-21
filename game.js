@@ -1524,6 +1524,11 @@ function initGame(difficulty, province_choice, student_count){
   try{
     for(let s of game.students){
       if(!s) continue;
+      s.knowledge_ds     = (s.knowledge_ds || 0) + 20 * Math.random();
+      s.knowledge_graph  = (s.knowledge_graph || 0) + 20 * Math.random();
+      s.knowledge_string = (s.knowledge_string || 0) + 20 * Math.random();
+      s.knowledge_math   = (s.knowledge_math || 0) + 20 * Math.random();
+      s.knowledge_dp     = (s.knowledge_dp || 0) + 20 * Math.random();
       try{
         if(typeof s.triggerTalents === 'function'){
           s.triggerTalents('game_start', {});
