@@ -27,7 +27,7 @@ function selfTraining() {
   const pressureInc = 25;    // 自主训练压力增加
   const comfortLoss = 1;    // 稍微掉一点舒适度
 
-  const libraryLevel = game.facilities.library;
+  const libraryLevel = game.facilities.library || 1;
   let libraryBonus = 0;
   if(libraryLevel === 1) libraryBonus = 0.00;
   else if(libraryLevel === 2) libraryBonus = 0.05;
@@ -35,7 +35,7 @@ function selfTraining() {
   else if(libraryLevel === 4) libraryBonus = 0.18;
   else if(libraryLevel === 5) libraryBonus = 0.29;
     
-  const computerLevel = game.facilities.computer;
+  const computerLevel = game.facilities.computer || 1;
   let computerBonus = 0;
   if(computerLevel === 1) computerBonus = 0;
   else if(computerLevel === 2) computerBonus = 0.05;
@@ -43,7 +43,7 @@ function selfTraining() {
   else if(computerLevel === 4) computerBonus = 0.2;
   else if(computerLevel === 5) computerBonus = 0.3;
 
-  const multiplier = 1.0 + libraryBonus + computerLevel;
+  const multiplier = 1.0 + libraryBonus + computerBonus;
 
   students.forEach(s => {
     // 五大知识
