@@ -27,13 +27,30 @@ function selfTraining() {
   const pressureInc = 25;    // 自主训练压力增加
   const comfortLoss = 1;    // 稍微掉一点舒适度
 
+  let libraryBonus = 0;
+  if(libraryLevel === 1) libraryBonus = 0.00;
+  else if(libraryLevel === 2) libraryBonus = 0.05;
+  else if(libraryLevel === 3) libraryBonus = 0.10;
+  else if(libraryLevel === 4) libraryBonus = 0.18;
+  else if(libraryLevel === 5) libraryBonus = 0.29;
+    
+  const computerLevel = game.facilities.computer;
+  let computerBonus = 0;
+  if(computerLevel === 1) computerBonus = 0;
+  else if(computerLevel === 2) computerBonus = 0.05;
+  else if(computerLevel === 3) computerBonus = 0.1;
+  else if(computerLevel === 4) computerBonus = 0.2;
+  else if(computerLevel === 5) computerBonus = 0.3;
+
+  const multiplier = 1.0 + libraryBonus + computerLevel;
+
   students.forEach(s => {
     // 五大知识
-    s.knowledge_ds     = (s.knowledge_ds || 0) + gain * Math.random();
-    s.knowledge_graph  = (s.knowledge_graph || 0) + gain * Math.random();
-    s.knowledge_string = (s.knowledge_string || 0) + gain * Math.random();
-    s.knowledge_math   = (s.knowledge_math || 0) + gain * Math.random();
-    s.knowledge_dp     = (s.knowledge_dp || 0) + gain * Math.random();
+    s.knowledge_ds     = (s.knowledge_ds || 0) + gain * multiplier * Math.random();
+    s.knowledge_graph  = (s.knowledge_graph || 0) + gain * multiplier * Math.random();
+    s.knowledge_string = (s.knowledge_string || 0) + gain * multiplier * Math.random();
+    s.knowledge_math   = (s.knowledge_math || 0) + gain * multiplier * Math.random();
+    s.knowledge_dp     = (s.knowledge_dp || 0) + gain * multiplier * Math.random();
 
     // 思维/代码基础能力
     s.thinking = (s.thinking || 0) + abilityGain * Math.random();
