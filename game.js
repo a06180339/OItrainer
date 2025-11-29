@@ -1,4 +1,3 @@
-
 /*
   game.js: 核心游戏逻辑
   包含游戏状态管理、回合更新、训练、比赛、事件处理等。
@@ -1616,40 +1615,6 @@ window.onload = ()=>{
     document.getElementById('action-learn').onclick = ()=>{ learnUI(); };
     document.getElementById('action-learn2').onclick = ()=>{ learn2UI(); };
     
-    // 动态添加“招生”和“专项训练”按钮（如果HTML中不存在）
-    const actionContainer = document.querySelector('.action-cards');
-    if(actionContainer){
-        // Add Recruit button if missing
-        if(!document.getElementById('action-recruit')){
-            const btn = document.createElement('div');
-            btn.className = 'action-card';
-            btn.id = 'action-recruit';
-            btn.setAttribute('role', 'button');
-            btn.setAttribute('tabindex', '0');
-            btn.innerHTML = '<div class="card-title">招生</div><div class="card-desc">招募新的信奥人才</div>';
-            const eventContainer = document.getElementById('event-cards-container');
-            if(eventContainer) actionContainer.insertBefore(btn, eventContainer);
-            else actionContainer.appendChild(btn);
-        }
-        // Add Special Train button if missing
-        if(!document.getElementById('action-special-train')){
-             const btn = document.createElement('div');
-            btn.className = 'action-card';
-            btn.id = 'action-special-train';
-            btn.setAttribute('role', 'button');
-            btn.setAttribute('tabindex', '0');
-            btn.innerHTML = '<div class="card-title">专项训练</div><div class="card-desc">针对代码、字符串等专项提升</div>';
-            const eventContainer = document.getElementById('event-cards-container');
-            if(eventContainer) actionContainer.insertBefore(btn, eventContainer);
-            else actionContainer.appendChild(btn);
-        }
-    }
-
-    const btnRecruit = document.getElementById('action-recruit');
-    if(btnRecruit) btnRecruit.onclick = () => { if(typeof recruitStudentUI === 'function') recruitStudentUI(); };
-    const btnSpecTrain = document.getElementById('action-special-train');
-    if(btnSpecTrain) btnSpecTrain.onclick = () => { if(typeof specialTrainingUI === 'function') specialTrainingUI(); };
-
     document.querySelectorAll('.btn.upgrade').forEach(b => {
       b.onclick = (e) => {
         const fac = b.dataset.fac;
