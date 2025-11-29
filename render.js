@@ -51,9 +51,14 @@ function getStudentQualificationStatus(student) {
     
     // 检查学生是否已经晋级下一场比赛
     // CSP-S1 不需要晋级资格，所有人都可以参加
-    if (nextComp.name === 'CSP-S1') {
+    // WC (冬令营) 也不受晋级链影响，所有人可参加（邀请赛性质）
+    if (nextComp.name === 'CSP-S1' || nextComp.isFriendly || nextComp.name === 'WC') {
       result.hasQualification = true;
-      result.html = '<span class="qualification-badge qualified" title="所有学生均可参加CSP-S1">✓</span>';
+      if(nextComp.name === 'WC') {
+          result.html = '<span class="qualification-badge qualified" title="冬令营(WC)为邀请赛，全员可参与">✓</span>';
+      } else {
+          result.html = `<span class="qualification-badge qualified" title="所有学生均可参加${nextComp.name}">✓</span>`;
+      }
       return result;
     }
     
@@ -406,26 +411,25 @@ function renderAll(){
   
   const comfortEl = $('comfort-val');
   if(comfortEl) comfortEl.innerText = Math.floor(displayComfort);
-  $('fac-computer').innerText = game.facilities.computer;
-  $('fac-library').innerText = game.facilities.library;
-  $('fac-ac').innerText = game.facilities.ac;
-  $('fac-dorm').innerText = game.facilities.dorm;
-  $('fac-canteen').innerText = game.facilities.canteen;
-  $('fac-maint').innerText = game.facilities.getMaintenanceCost();
   
-  // 同步更新设施状态显示区域（只读）
-  const displayEls = {
-    'fac-computer-display': game.facilities.computer,
-    'fac-library-display': game.facilities.library,
-    'fac-ac-display': game.facilities.ac,
-    'fac-dorm-display': game.facilities.dorm,
-    'fac-canteen-display': game.facilities.canteen,
-    'fac-maint-display': game.facilities.getMaintenanceCost()
-  };
-  for(let id in displayEls) {
-    const el = $(id);
-    if(el) el.innerText = displayEls[id];
+  // 修改设施面板，增加升级按钮
+  const facilitiesPanel = $('facilities-panel');
+  if(facilitiesPanel) {
+    facilitiesPanel.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h4 style="margin:0">设施状态</h4>
+          <button id="btn-upgrade-fac" class="btn small" style="padding:2px 8px;font-size:12px;">升级</button>
+      </div>
+      <div class="small" style="line-height:1.8">
+        <div>计算机 Lv.<span id="fac-computer-display">${game.facilities.computer}</span> | 资料库 Lv.<span id="fac-library-display">${game.facilities.library}</span></div>
+        <div>空调 Lv.<span id="fac-ac-display">${game.facilities.ac}</span> | 宿舍 Lv.<span id="fac-dorm-display">${game.facilities.dorm}</span></div>
+        <div>食堂 Lv.<span id="fac-canteen-display">${game.facilities.canteen}</span> | 维护费 ¥<span id="fac-maint-display">${game.facilities.getMaintenanceCost()}</span></div>
+      </div>
+    `;
+    const btn = document.getElementById('btn-upgrade-fac');
+    if(btn) btn.onclick = showFacilityUpgradeModal;
   }
+
   // 存储学生列表容器引用以便后续清理
   const studentListEl = $('student-list');
   
@@ -861,6 +865,129 @@ function trainStudentsUI(){
     renderAll();
   };
 }
+
+// ---------------------- 新增：招生界面 UI ----------------------
+function recruitStudentUI() {
+  const recruitOptions = [
+    { type: 1, name: "社团纳新", cost: 0, reputationCost: 0, desc: "基础招生，主要依靠学生兴趣", quality: "普通" },
+    { type: 2, name: "特长生选拔", cost: 15000, reputationCost: 0, desc: "举办选拔考试，筛选优质生源", quality: "优秀" },
+    { type: 3, name: "挖角", cost: 50000, reputationCost: 30, desc: "动用关系和声誉，挖来顶尖苗子", quality: "顶尖" }
+  ];
+
+  let cardsHtml = recruitOptions.map(opt => `
+    <div class="recruit-card option-card" data-type="${opt.type}" style="border:1px solid #ddd;padding:12px;border-radius:6px;cursor:pointer;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;">
+        <div class="card-title" style="font-weight:bold;">${opt.name}</div>
+        <div class="card-cost" style="font-size:12px;color:#d32f2f;">
+           ${opt.cost > 0 ? '¥' + opt.cost : '免费'} 
+           ${opt.reputationCost > 0 ? ` + ${opt.reputationCost} 声誉` : ''}
+        </div>
+      </div>
+      <div class="card-desc small muted" style="margin-top:4px;">${opt.desc}</div>
+      <div class="small" style="margin-top:4px;color:#1976d2;">生源质量：${opt.quality}</div>
+    </div>
+  `).join('');
+
+  showModal(`
+    <h3>招募新学生</h3>
+    <div class="small muted" style="margin-bottom:12px;">选择一种招生方式。更高级的方式能招到初始能力更强的学生，但花费较高。</div>
+    <div id="recruit-options-list">${cardsHtml}</div>
+    <div class="modal-actions" style="margin-top:12px">
+      <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn" id="recruit-confirm">确认招募</button>
+    </div>
+  `);
+
+  const cards = document.querySelectorAll('.recruit-card');
+  if(cards.length > 0) cards[0].classList.add('selected');
+
+  cards.forEach(card => {
+    card.onclick = () => {
+      cards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    };
+  });
+
+  $('recruit-confirm').onclick = () => {
+    const selected = document.querySelector('.recruit-card.selected');
+    if(!selected) return;
+    const type = parseInt(selected.dataset.type);
+    const opt = recruitOptions.find(o => o.type === type);
+
+    if (game.budget < opt.cost) {
+      alert("经费不足！");
+      return;
+    }
+    if (game.reputation < opt.reputationCost) {
+      alert("声誉不足！");
+      return;
+    }
+
+    closeModal();
+    
+    // 执行招募逻辑 (假设 logic 写在 game.js 或直接在这里)
+    // 这里直接写简化逻辑，或者调用 game.js 里的方法
+    game.recruitStudent(opt);
+    renderAll();
+  };
+}
+
+// ---------------------- 新增：专项训练 UI ----------------------
+function specialTrainingUI() {
+  const trainTypes = [
+    { id: 'coding', label: '代码突击', boostType: 'coding', desc: '集中训练代码实现能力' },
+    { id: 'thinking', label: '思维拓展', boostType: 'thinking', desc: '通过难题训练思维能力' },
+    { id: 'ds', label: '数据结构', boostType: '知识-数据结构', desc: '专项强化数据结构知识' },
+    { id: 'graph', label: '图论', boostType: '知识-图论', desc: '专项强化图论算法' },
+    { id: 'math', label: '数学', boostType: '知识-数学', desc: '专项强化数论与组合数学' },
+    { id: 'string', label: '字符串', boostType: '知识-字符串', desc: '专项强化字符串算法' },
+    { id: 'dp', label: '动态规划', boostType: '知识-DP', desc: '专项强化DP模型' },
+  ];
+
+  let gridHtml = trainTypes.map(t => `
+    <div class="spec-train-card option-card" data-id="${t.id}" style="border:1px solid #eee;padding:10px;border-radius:6px;cursor:pointer;text-align:center;">
+      <div style="font-weight:bold;">${t.label}</div>
+      <div class="small muted">${t.desc}</div>
+    </div>
+  `).join('');
+
+  showModal(`
+    <h3>专项训练</h3>
+    <div class="small muted" style="margin-bottom:12px;">选择一个方向进行针对性强化训练。专项训练能大幅提升特定能力，但会略微增加额外压力。</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:10px;">
+      ${gridHtml}
+    </div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn" id="spec-train-confirm">开始训练 (1周)</button>
+    </div>
+  `);
+
+  const cards = document.querySelectorAll('.spec-train-card');
+  if(cards.length > 0) cards[0].classList.add('selected');
+
+  cards.forEach(c => {
+    c.onclick = () => {
+      cards.forEach(x => x.classList.remove('selected'));
+      c.classList.add('selected');
+    };
+  });
+
+  $('spec-train-confirm').onclick = () => {
+    const selected = document.querySelector('.spec-train-card.selected');
+    if(!selected) return;
+    const id = selected.dataset.id;
+    const typeObj = trainTypes.find(t => t.id === id);
+
+    closeModal();
+    // 调用 game.js 中的专项训练逻辑
+    game.specializedTrain(typeObj);
+    safeWeeklyUpdate(1);
+    renderAll();
+  };
+}
+
+// -------------------------------------------------------------
 
 function holdMockContestUI(){
   const officialContestOptions = COMPETITION_SCHEDULE.map((comp, idx) => 
@@ -1610,6 +1737,7 @@ const CONTEST_VALUE_MAP = {
   'CSP-S1': 1,
   'CSP-S2': 1.5,
   'NOIP': 4,
+  'WC': 2.5, // WC 分数适中
   '省选': 0,
   'NOI': 8,
   'CTS': 0,
@@ -2170,5 +2298,3 @@ function learn2UI() {
     </div>
   `);
 }
-
-
