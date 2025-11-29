@@ -1,4 +1,3 @@
-
 /*
     render.js: UI 渲染逻辑
     包含所有与 DOM 操作相关的函数，如 `renderAll`、模态框显示、UI 交互等。
@@ -52,14 +51,9 @@ function getStudentQualificationStatus(student) {
     
     // 检查学生是否已经晋级下一场比赛
     // CSP-S1 不需要晋级资格，所有人都可以参加
-    // WC (冬令营) 也不受晋级链影响，所有人可参加（邀请赛性质）
-    if (nextComp.name === 'CSP-S1' || nextComp.isFriendly || nextComp.name === 'WC') {
+    if (nextComp.name === 'CSP-S1') {
       result.hasQualification = true;
-      if(nextComp.name === 'WC') {
-          result.html = '<span class="qualification-badge qualified" title="冬令营(WC)为邀请赛，全员可参与">✓</span>';
-      } else {
-          result.html = `<span class="qualification-badge qualified" title="所有学生均可参加${nextComp.name}">✓</span>`;
-      }
+      result.html = '<span class="qualification-badge qualified" title="所有学生均可参加CSP-S1">✓</span>';
       return result;
     }
     
@@ -412,25 +406,26 @@ function renderAll(){
   
   const comfortEl = $('comfort-val');
   if(comfortEl) comfortEl.innerText = Math.floor(displayComfort);
+  $('fac-computer').innerText = game.facilities.computer;
+  $('fac-library').innerText = game.facilities.library;
+  $('fac-ac').innerText = game.facilities.ac;
+  $('fac-dorm').innerText = game.facilities.dorm;
+  $('fac-canteen').innerText = game.facilities.canteen;
+  $('fac-maint').innerText = game.facilities.getMaintenanceCost();
   
-  // 修改设施面板，增加升级按钮
-  const facilitiesPanel = $('facilities-panel');
-  if(facilitiesPanel) {
-    facilitiesPanel.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <h4 style="margin:0">设施状态</h4>
-          <button id="btn-upgrade-fac" class="btn small" style="padding:2px 8px;font-size:12px;">升级</button>
-      </div>
-      <div class="small" style="line-height:1.8">
-        <div>计算机 Lv.<span id="fac-computer-display">${game.facilities.computer}</span> | 资料库 Lv.<span id="fac-library-display">${game.facilities.library}</span></div>
-        <div>空调 Lv.<span id="fac-ac-display">${game.facilities.ac}</span> | 宿舍 Lv.<span id="fac-dorm-display">${game.facilities.dorm}</span></div>
-        <div>食堂 Lv.<span id="fac-canteen-display">${game.facilities.canteen}</span> | 维护费 ¥<span id="fac-maint-display">${game.facilities.getMaintenanceCost()}</span></div>
-      </div>
-    `;
-    const btn = document.getElementById('btn-upgrade-fac');
-    if(btn) btn.onclick = showFacilityUpgradeModal;
+  // 同步更新设施状态显示区域（只读）
+  const displayEls = {
+    'fac-computer-display': game.facilities.computer,
+    'fac-library-display': game.facilities.library,
+    'fac-ac-display': game.facilities.ac,
+    'fac-dorm-display': game.facilities.dorm,
+    'fac-canteen-display': game.facilities.canteen,
+    'fac-maint-display': game.facilities.getMaintenanceCost()
+  };
+  for(let id in displayEls) {
+    const el = $(id);
+    if(el) el.innerText = displayEls[id];
   }
-
   // 存储学生列表容器引用以便后续清理
   const studentListEl = $('student-list');
   
@@ -1806,7 +1801,7 @@ function outingTrainingUI() {
       const btn = document.createElement('button');
       btn.className = 'prov-btn';
       btn.textContent = p.name;
-      btn.dataset.val=k;
+      btn.dataset.val = k;
       btn.onclick = () => {
         document.querySelectorAll('#out-prov-grid .prov-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
@@ -2176,215 +2171,4 @@ function learn2UI() {
   `);
 }
 
-function recruitStudentUI(){
-  const candidates = [];
-  for(let i=0; i<3; i++){
-    let thinking = clamp(normal(40, 15), 10, 90);
-    let coding = clamp(normal(40, 15), 10, 90);
-    let mental = clamp(normal(50, 15), 20, 100);
-    
-    // 成本计算：基础20000 + 能力加成
-    let cost = 20000 + (thinking-40)*500 + (coding-40)*500;
-    cost = Math.max(5000, Math.floor(cost / 100) * 100); // 整百取整，最低5000
-    
-    // 生成名字
-    let name = "新人" + String.fromCharCode(65+i);
-    if(typeof generateName === 'function'){
-      name = generateName({ region: game.province_name });
-    }
-    
-    candidates.push({ name, thinking, coding, mental, cost });
-  }
-  
-  let html = `<h3>招募新队员</h3><div class="small muted" style="margin-bottom:12px">发现了一些潜力苗子，是否花费经费招募入队？</div>`;
-  html += `<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;">`;
-  
-  candidates.forEach((c, idx) => {
-    html += `
-      <div class="recruit-card" style="border:1px solid #ddd;padding:10px;border-radius:6px;background:#f9f9f9">
-        <div style="font-weight:bold;font-size:16px;margin-bottom:6px">${c.name}</div>
-        <div class="small">思维: ${Math.floor(c.thinking)}</div>
-        <div class="small">代码: ${Math.floor(c.coding)}</div>
-        <div class="small">心态: ${Math.floor(c.mental)}</div>
-        <div style="margin-top:10px;color:#d97706;font-weight:bold">¥${c.cost}</div>
-        <button class="btn small recruit-btn" data-idx="${idx}" style="width:100%;margin-top:8px">招募</button>
-      </div>
-    `;
-  });
-  html += `</div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">关闭</button></div>`;
-  
-  showModal(html);
-  
-  document.querySelectorAll('.recruit-btn').forEach(btn => {
-    btn.onclick = (e) => {
-      const idx = parseInt(e.target.dataset.idx);
-      const cand = candidates[idx];
-      
-      if(game.budget < cand.cost){
-        alert("经费不足！");
-        return;
-      }
-      
-      // 招募逻辑
-      game.recordExpense(cand.cost, `招募学生：${cand.name}`);
-      const newStudent = new Student(cand.name, cand.thinking, cand.coding, cand.mental);
-      
-      // 初始稍微给点知识
-      newStudent.knowledge_ds = 10;
-      newStudent.knowledge_graph = 10;
-      newStudent.knowledge_string = 10;
-      newStudent.knowledge_math = 10;
-      newStudent.knowledge_dp = 10;
-      
-      // 尝试分配初始天赋
-      try{ 
-        if(window.TalentManager && typeof window.TalentManager.assignInitialTalent === 'function'){
-           window.TalentManager.assignInitialTalent(newStudent); 
-        }
-      }catch(err){}
-      
-      game.students.push(newStudent);
-      
-      log(`成功招募：${cand.name}，花费 ¥${cand.cost}`);
-      closeModal();
-      renderAll();
-    };
-  });
-}
 
-function specialTrainingUI(){
-  const types = [
-    {key: 'coding', label: '代码能力', cost: 5000, desc: '集中强化代码实现能力'},
-    {key: 'thinking', label: '思维能力', cost: 5000, desc: '集中强化算法思维'},
-    {key: 'knowledge_ds', label: '数据结构', cost: 3000, desc: '针对数据结构的专项特训'},
-    {key: 'knowledge_graph', label: '图论', cost: 3000, desc: '针对图论算法的专项特训'},
-    {key: 'knowledge_string', label: '字符串', cost: 3000, desc: '针对字符串算法的专项特训'},
-    {key: 'knowledge_math', label: '数学', cost: 3000, desc: '针对数论组合的专项特训'},
-    {key: 'knowledge_dp', label: '动态规划', cost: 3000, desc: '针对DP的专项特训'}
-  ];
-  
-  let typeHtml = types.map((t, i) => `
-    <div class="option-card spec-train-type ${i===0?'selected':''}" data-key="${t.key}" data-cost="${t.cost}" style="padding:8px;border:1px solid #ddd;border-radius:4px;cursor:pointer;margin-bottom:6px">
-      <div style="font-weight:600">${t.label} <span style="font-weight:normal;color:#666;font-size:12px">¥${t.cost}</span></div>
-      <div class="small muted">${t.desc}</div>
-    </div>
-  `).join('');
-  
-  showModal(`
-    <h3>专项特训（1周）</h3>
-    <div style="display:flex;gap:12px;height:400px">
-      <div style="flex:1;overflow-y:auto;border-right:1px solid #eee;padding-right:8px">
-        <label class="block">训练项目</label>
-        ${typeHtml}
-      </div>
-      <div style="flex:1;overflow-y:auto;padding-left:8px">
-        <label class="block">选择参与学生</label>
-        <div id="spec-train-students"></div>
-      </div>
-    </div>
-    <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-      <div>总费用: <strong id="spec-total-cost">¥0</strong></div>
-      <div class="modal-actions" style="margin-top:0">
-        <button class="btn btn-ghost" onclick="closeModal()">取消</button>
-        <button class="btn" id="spec-train-confirm">开始特训</button>
-      </div>
-    </div>
-  `);
-  
-  // 渲染学生列表
-  const stuContainer = document.getElementById('spec-train-students');
-  const activeStus = game.students.filter(s => s && s.active);
-  activeStus.forEach(s => {
-    const div = document.createElement('div');
-    div.className = 'student-select-item option-card'; // Reuse option-card for styling
-    div.dataset.name = s.name;
-    div.style.padding = '6px';
-    div.style.marginBottom = '4px';
-    div.style.border = '1px solid #eee';
-    div.style.borderRadius = '4px';
-    div.style.cursor = 'pointer';
-    div.innerHTML = `${s.name}`;
-    div.onclick = () => {
-      div.classList.toggle('selected');
-      updateSpecCost();
-    };
-    stuContainer.appendChild(div);
-  });
-  
-  // 类型选择逻辑
-  document.querySelectorAll('.spec-train-type').forEach(el => {
-    el.onclick = () => {
-      document.querySelectorAll('.spec-train-type').forEach(x => x.classList.remove('selected'));
-      el.classList.add('selected');
-      updateSpecCost();
-    };
-  });
-  
-  function updateSpecCost(){
-    const typeEl = document.querySelector('.spec-train-type.selected');
-    if(!typeEl) return;
-    const baseCost = parseInt(typeEl.dataset.cost);
-    const count = document.querySelectorAll('.student-select-item.selected').length;
-    const total = baseCost * count;
-    document.getElementById('spec-total-cost').innerText = `¥${total}`;
-  }
-  
-  // 初始全选学生
-  document.querySelectorAll('.student-select-item').forEach(el => el.classList.add('selected'));
-  updateSpecCost();
-  
-  $('spec-train-confirm').onclick = () => {
-    const typeEl = document.querySelector('.spec-train-type.selected');
-    const selectedEls = document.querySelectorAll('.student-select-item.selected');
-    
-    if(!typeEl || selectedEls.length === 0){
-      alert("请选择项目和至少一名学生");
-      return;
-    }
-    
-    const key = typeEl.dataset.key;
-    const label = typeEl.querySelector('div').innerText.split(' ')[0];
-    const baseCost = parseInt(typeEl.dataset.cost);
-    const count = selectedEls.length;
-    const total = baseCost * count;
-    
-    if(game.budget < total){
-      alert("经费不足");
-      return;
-    }
-    
-    game.recordExpense(total, `专项特训：${label}`);
-    
-    const selectedNames = Array.from(selectedEls).map(el => el.dataset.name);
-    
-    // 执行训练逻辑
-    game.students.forEach(s => {
-      if(selectedNames.includes(s.name)){
-        // 专项大幅提升，其他微量提升
-        let gain = 0;
-        if(key === 'coding' || key === 'thinking'){
-          gain = uniform(3.0, 6.0); // 能力值提升较难
-        } else {
-          gain = uniform(30, 50); // 知识点提升较快
-        }
-        
-        // 应用提升
-        if(key === 'coding') s.coding += gain;
-        else if(key === 'thinking') s.thinking += gain;
-        else s[key] = (s[key] || 0) + gain;
-        
-        // 压力增加
-        s.pressure = Math.min(100, s.pressure + 15);
-        s.comfort = Math.max(0, s.comfort - 5);
-      } else if(s.active) {
-        // 未参加的学生自习，微量提升
-        s.pressure = Math.max(0, s.pressure - 5);
-      }
-    });
-    
-    log(`专项特训（${label}）完成，${count}人参与，费用 ¥${total}`);
-    closeModal();
-    safeWeeklyUpdate(1);
-    renderAll();
-  };
-}
