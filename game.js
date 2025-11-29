@@ -1615,6 +1615,12 @@ window.onload = ()=>{
     document.getElementById('action-learn').onclick = ()=>{ learnUI(); };
     document.getElementById('action-learn2').onclick = ()=>{ learn2UI(); };
     
+    // 绑定新添加的功能按钮
+    const btnRecruit = document.getElementById('action-recruit');
+    if(btnRecruit) btnRecruit.onclick = () => { recruitStudentUI(); };
+    const btnSpecTrain = document.getElementById('action-special-train');
+    if(btnSpecTrain) btnSpecTrain.onclick = () => { specialTrainingUI(); };
+
     document.querySelectorAll('.btn.upgrade').forEach(b => {
       b.onclick = (e) => {
         const fac = b.dataset.fac;
@@ -1627,16 +1633,4 @@ window.onload = ()=>{
     // 暴露设施升级界面函数到全局作用域
     window.showFacilityUpgradeModal = showFacilityUpgradeModal;
     // 暴露压力预计算函数到全局作用域
-    window.calculateTrainingPressure = calculateTrainingPressure;
     
-    renderAll();
-    
-    if (qs && qs.get('new') === '1' && window.tutorialManager) {
-      setTimeout(() => {
-        window.tutorialManager.start();
-      }, 500);
-    }
-  } else {
-    // not index page: do nothing. start.html will call renderStartPageUI; end.html will call renderEndSummary.
-  }
-};
