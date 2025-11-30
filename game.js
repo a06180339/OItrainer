@@ -22,10 +22,10 @@ function selfTraining() {
   if (!game || !game.students) return;
 
   const students = game.students.filter(s => s && s.active);
-  const gain = 10;         // 每项知识点提升（可以调）
-  const abilityGain = 3;  // 思维、代码提升
-  const pressureInc = 25;    // 自主训练压力增加
-  const comfortLoss = 1;    // 稍微掉一点舒适度
+  const gain = 7;         // 每项知识点提升（可以调）
+  const abilityGain = 2;  // 思维、代码提升
+  const pressureInc = 30;    // 自主训练压力增加
+  const comfortLoss = 15;    // 稍微掉一点舒适度
 
   const libraryLevel = game.facilities.library || 1;
   let libraryBonus = 0;
@@ -139,10 +139,10 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
   // abilityGain：思维/编程等能力提升（更低）
   // pressureInc：压力增加（明显）
   // comfortLoss：学生舒适度下降（封闭训练带来的不适）
-  const gain = diff * 20;         // 知识提升基准（低）
-  const abilityGain = diff * 5; // 能力提升（更低）
-  const pressureInc = diff * 10;    // 压力明显增加
-  const comfortLoss = diff * 3;    // 舒适度下降
+  const gain = diff * 8;         // 知识提升基准（低）
+  const abilityGain = diff * 3; // 能力提升（更低）
+  const pressureInc = diff * 20;    // 压力明显增加
+  const comfortLoss = diff * 5;    // 舒适度下降
 
   const beforeSnap = typeof __createSnapshot === 'function' ? __createSnapshot() : null;
 
@@ -167,7 +167,7 @@ function schoolCampTraining(diff, studentNames, selectedTalents) {
 
     // 天赋激发（校内：概率较低，设为20%）
     for (const t of selectedTalents) {
-      if (Math.random() < 0.75) {
+      if (1) {
         if (!s.talents) s.talents = new Set();
         s.talents.add(t);
         // 触发事件记录
