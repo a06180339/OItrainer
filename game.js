@@ -477,10 +477,10 @@ function trainStudentsWithTask(task, intensity) {
     const libraryLevel = game.facilities.library;
     let libraryBonus = 0;
     if(libraryLevel === 1) libraryBonus = 0.00;
-    else if(libraryLevel === 2) libraryBonus = 0.05;
-    else if(libraryLevel === 3) libraryBonus = 0.10;
-    else if(libraryLevel === 4) libraryBonus = 0.18;
-    else if(libraryLevel === 5) libraryBonus = 0.29;
+    else if(libraryLevel === 2) libraryBonus = 0.2;
+    else if(libraryLevel === 3) libraryBonus = 0.4;
+    else if(libraryLevel === 4) libraryBonus = 0.6;
+    else if(libraryLevel === 5) libraryBonus = 0.8;
     
     const libraryMultiplier = 1.0 + libraryBonus;
     
@@ -489,7 +489,7 @@ function trainStudentsWithTask(task, intensity) {
     // 应用知识点增加：基础效率加成 + 图书馆加成 + 强度系数 + 生病惩罚
     for(const boost of results.boosts) {
       // 计算总的知识点增加（包含所有加成因素）
-      const totalBoost = Math.floor(boost.actualAmount * libraryMultiplier * intensityFactor * sick_penalty);
+      const totalBoost = Math.floor(uniform(1, 3) * boost.actualAmount * libraryMultiplier * intensityFactor * sick_penalty);
       s.addKnowledge(boost.type, totalBoost);
       // 更新 actualAmount 为实际增加量，以便日志正确显示
       boost.actualAmount = totalBoost;
@@ -498,23 +498,23 @@ function trainStudentsWithTask(task, intensity) {
     const computerLevel = game.facilities.computer;
     let computerBonus = 0;
     if(computerLevel === 1) computerBonus = 0;
-    else if(computerLevel === 2) computerBonus = 0.05;
-    else if(computerLevel === 3) computerBonus = 0.1;
-    else if(computerLevel === 4) computerBonus = 0.2;
-    else if(computerLevel === 5) computerBonus = 0.3;
+    else if(computerLevel === 2) computerBonus = 0.3;
+    else if(computerLevel === 3) computerBonus = 0.6;
+    else if(computerLevel === 4) computerBonus = 0.9;
+    else if(computerLevel === 5) computerBonus = 1.2;
     
     const computerMultiplier = 1.0 + computerBonus;
     
     const abilityGainBase = boostMultiplier * intensityFactor;
-    const thinkingGain = uniform(0.6, 1.5) * abilityGainBase * computerMultiplier * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
-    const codingGain = uniform(1, 2.5) * abilityGainBase * computerMultiplier * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
+    const thinkingGain = uniform(1, 3) * abilityGainBase * computerMultiplier * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
+    const codingGain = uniform(1, 3) * abilityGainBase * computerMultiplier * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
     
     s.thinking += thinkingGain;
     s.coding += codingGain;
     s.thinking = (s.thinking || 0);
     s.coding = (s.coding || 0);
     
-    let base_pressure = (intensity===1) ? 15 : (intensity===2) ? 25 : 40;
+    let base_pressure = (intensity===1) ? 10 : (intensity===2) ? 15 : 20;
     
     const difficultyPressure = Math.max(0, (task.difficulty - studentAbility) * 0.2);
     base_pressure += difficultyPressure;
@@ -524,7 +524,6 @@ function trainStudentsWithTask(task, intensity) {
     
     let canteen_reduction = game.facilities.getCanteenPressureReduction();
     let pressure_increase = base_pressure * weather_factor * canteen_reduction * comfort_factor;
-    if(s.sick_weeks > 0) pressure_increase += 10;
     
     pressure_increase *= (typeof PRESSURE_INCREASE_MULTIPLIER !== 'undefined' ? PRESSURE_INCREASE_MULTIPLIER : 1.0);
     
