@@ -26,7 +26,7 @@
 
 ## 🎮 游玩方式
 
-直接访问 👉 [oi.seveoi.icu](https://oi.seveoi.icu) 即可开始游戏。
+直接访问 👉 [https://a06180339.github.io/OItrainer/start.html](https://a06180339.github.io/OItrainer/start.html) 即可开始游戏。
 
 ---
 
@@ -64,9 +64,9 @@
 
 ## ✉️ 致谢与联系方式
 
-- 作者：**seve42**  
-- Luogu：`seve_`  
-- 邮箱：`dreamer-seve@outlook.com` 或 `dreamersseve@gmail.com`
+- 原作者：**seve42**
+- 猪猪改版
+- 原作链接：[https://seve42.github.io/OItrainer/start.html](https://seve42.github.io/OItrainer/start.html)
 
 ---
 
