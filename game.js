@@ -212,7 +212,7 @@ function calculateTrainingPressure(task, intensity) {
       else if(intensity===2) base_pressure *= TRAINING_PRESSURE_MULTIPLIER_MEDIUM;
       
       let canteen_reduction = game.facilities.getCanteenPressureReduction();
-      let pressure_increase = base_pressure * weather_factor * canteen_reduction * comfort_factor;
+      let pressure_increase = base_pressure * weather_factor * canteen_reduction * comfort_factor * 0.4;
       if(s.sick_weeks > 0) pressure_increase += 10;
       
       pressure_increase *= (typeof PRESSURE_INCREASE_MULTIPLIER !== 'undefined' ? PRESSURE_INCREASE_MULTIPLIER : 1.0);
