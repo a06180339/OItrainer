@@ -212,8 +212,8 @@ function calculateTrainingPressure(task, intensity) {
       else if(intensity===2) base_pressure *= TRAINING_PRESSURE_MULTIPLIER_MEDIUM;
       
       let canteen_reduction = game.facilities.getCanteenPressureReduction();
-      let pressure_increase = base_pressure * weather_factor * canteen_reduction * comfort_factor * 0.4;
-      if(s.sick_weeks > 0) pressure_increase += 10;
+      let pressure_increase = base_pressure * weather_factor * canteen_reduction * comfort_factor * 0.2;
+      if(s.sick_weeks > 0) pressure_increase += 5;
       
       pressure_increase *= (typeof PRESSURE_INCREASE_MULTIPLIER !== 'undefined' ? PRESSURE_INCREASE_MULTIPLIER : 1.0);
       
@@ -354,9 +354,9 @@ function trainStudentsWithTask(task, intensity) {
     const computerMultiplier = 1.0 + computerBonus;
     
     const abilityGainBase = boostMultiplier * intensityFactor * (1 - Math.min(0.6, s.pressure/200.0));
-    const stateFactor = uniform(0.4, 1.8); // 随机波动：最差只有40%效果，最好有180%效果
-    const thinkingGain = uniform(0.6, 1.5) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
-    const codingGain = uniform(1, 2.5) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
+    const stateFactor = uniform(0.9, 1.8); // 随机波动：最差只有40%效果，最好有180%效果
+    const thinkingGain = uniform(0.8, 1.5) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
+    const codingGain = uniform(1.5, 2.5) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
     
     s.thinking += thinkingGain;
     s.coding += codingGain;
@@ -372,7 +372,7 @@ function trainStudentsWithTask(task, intensity) {
     else if(intensity===2) base_pressure *= TRAINING_PRESSURE_MULTIPLIER_MEDIUM;
     
     let canteen_reduction = game.facilities.getCanteenPressureReduction();
-    let pressure_increase = base_pressure * weather_factor * canteen_reduction * comfort_factor * uniform(0.2, 0.6);
+    let pressure_increase = base_pressure * weather_factor * canteen_reduction * comfort_factor * uniform(0.1, 0.3);
     if(s.sick_weeks > 0) pressure_increase += 10;
     
     pressure_increase *= (typeof PRESSURE_INCREASE_MULTIPLIER !== 'undefined' ? PRESSURE_INCREASE_MULTIPLIER : 1.0);
