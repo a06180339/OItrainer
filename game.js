@@ -356,6 +356,10 @@ function trainStudentsWithTask(task, intensity) {
     const abilityGainBase = boostMultiplier * intensityFactor * (1 - Math.min(0.6, s.pressure/200.0));
     const thinkingGain = uniform(0.6, 1.5) * abilityGainBase * computerMultiplier * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
     const codingGain = uniform(1, 2.5) * abilityGainBase * computerMultiplier * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
+
+    const stateFactor = uniform(0.4, 1.8); // 随机波动：最差只有40%效果，最好有180%效果
+    const thinkingGain = uniform(0.6, 1.5) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
+    const codingGain = uniform(1, 2.5) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
     
     s.thinking += thinkingGain;
     s.coding += codingGain;
@@ -371,7 +375,7 @@ function trainStudentsWithTask(task, intensity) {
     else if(intensity===2) base_pressure *= TRAINING_PRESSURE_MULTIPLIER_MEDIUM;
     
     let canteen_reduction = game.facilities.getCanteenPressureReduction();
-    let pressure_increase = base_pressure * weather_factor * canteen_reduction * comfort_factor;
+    let pressure_increase = base_pressure * weather_factor * canteen_reduction * comfort_factor * uniform(0.2, 0.6);
     if(s.sick_weeks > 0) pressure_increase += 10;
     
     pressure_increase *= (typeof PRESSURE_INCREASE_MULTIPLIER !== 'undefined' ? PRESSURE_INCREASE_MULTIPLIER : 1.0);
