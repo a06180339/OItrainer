@@ -1376,7 +1376,7 @@ function initGame(difficulty, province_choice, student_count){
     let coding = clamp(normal(mean * uniform(0.9, 1.1), stddev), 5, 100);
     let mental = clamp(normal(mean * uniform(0.9, 1.1), stddev), 5, 100);
     const newStud = new Student(name, thinking, coding, mental);
-    const base = KNOWLEDGE_ABLILTY_START * potentialFactor;
+    const base = KNOWLEDGE_ABLILTY_START;
     newStud.knowledge_ds     = clampInt(normal(base, 5), 0, 40);
     newStud.knowledge_graph  = clampInt(normal(base, 5), 0, 40);
     newStud.knowledge_string = clampInt(normal(base, 5), 0, 40);
