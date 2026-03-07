@@ -65,6 +65,22 @@ function getStudentQualificationStatus(student) {
     };
     
     const requiredComp = qualChain[nextComp.name];
+      if (['WC', 'APIO'].includes(nextComp.name)) {
+    // 这种比赛看分数，不显示“✗未晋级”，显示“分数入围制”
+    const threshold = (nextComp.name === 'WC') ? WC_ENTRY_THRESHOLD : APIO_ENTRY_THRESHOLD;
+    // 获取最近成绩
+    const lastCSP = (game.careerCompetitions || []).slice().reverse().find(r => r.name === 'CSP-S2');
+    const studentScore = lastCSP?.entries.find(e => e.name === student.name)?.score || 0;
+    
+    if (studentScore >= threshold) {
+        result.hasQualification = true;
+        result.html = `<span class="qualification-badge qualified">✓ 已入围 ${nextComp.name}</span>`;
+    } else {
+        result.hasQualification = false;
+        result.html = `<span class="qualification-badge not-qualified">✗ 分数不足 ${nextComp.name}</span>`;
+    }
+    return result;
+}
     if (requiredComp) {
       // 检查学生是否在qualification集合中
       const qualSet = game.qualification[currentHalf][requiredComp];
