@@ -1302,7 +1302,7 @@ function initGame(difficulty, province_choice, student_count){
   game.difficulty = clampInt(difficulty,1,3);
   let prov = PROVINCES[province_choice] || PROVINCES[1];
   game.province_id = province_choice;
-  game.province_name = prov.name; game.province_type = prov.type; game.is_north = prov.isNorth; game.budget = prov.baseBudget; game.base_comfort = prov.isNorth?BASE_COMFORT_NORTH:BASE_COMFORT_SOUTH;
+  game.province_name = prov.name; game.province_type = prov.type; game.is_north = prov.isNorth; game.budget = Math.floor(uniform(1.5, 1.8) * prov.baseBudget); game.base_comfort = prov.isNorth?BASE_COMFORT_NORTH:BASE_COMFORT_SOUTH;
   try{ game.province_climate = prov.climate || null; }catch(e){ game.province_climate = null; }
   
   // 如果选择香港(14)或澳门(25)，设置使用繁体中文
@@ -1372,10 +1372,16 @@ function initGame(difficulty, province_choice, student_count){
     }
     let mean = (min_val + max_val) / 2;
     let stddev = (max_val - min_val);
-    let thinking = clamp(normal(mean, stddev), 0, 100);
-    let coding = clamp(normal(mean, stddev), 0, 100);
-    let mental = clamp(normal(mean, stddev), 0, 100);
+    let thinking = clamp(normal(mean * uniform(0.9, 1.1), stddev), 5, 100);
+    let coding = clamp(normal(mean * uniform(0.9, 1.1), stddev), 5, 100);
+    let mental = clamp(normal(mean * uniform(0.9, 1.1), stddev), 5, 100);
     const newStud = new Student(name, thinking, coding, mental);
+    const base = KNOWLEDGE_ABLILTY_START * potentialFactor;
+    newStud.knowledge_ds     = clampInt(normal(base, 5), 0, 40);
+    newStud.knowledge_graph  = clampInt(normal(base, 5), 0, 40);
+    newStud.knowledge_string = clampInt(normal(base, 5), 0, 40);
+    newStud.knowledge_math   = clampInt(normal(base, 5), 0, 40);
+    newStud.knowledge_dp     = clampInt(normal(base, 5), 0, 40);
     try{ if(window.TalentManager && typeof window.TalentManager.assignInitialTalent === 'function') window.TalentManager.assignInitialTalent(newStud); }catch(e){}
     game.students.push(newStud);
   }
