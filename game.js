@@ -354,9 +354,6 @@ function trainStudentsWithTask(task, intensity) {
     const computerMultiplier = 1.0 + computerBonus;
     
     const abilityGainBase = boostMultiplier * intensityFactor * (1 - Math.min(0.6, s.pressure/200.0));
-    const thinkingGain = uniform(0.6, 1.5) * abilityGainBase * computerMultiplier * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
-    const codingGain = uniform(1, 2.5) * abilityGainBase * computerMultiplier * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
-
     const stateFactor = uniform(0.4, 1.8); // 随机波动：最差只有40%效果，最好有180%效果
     const thinkingGain = uniform(0.6, 1.5) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
     const codingGain = uniform(1, 2.5) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
