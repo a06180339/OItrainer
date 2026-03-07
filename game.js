@@ -761,6 +761,17 @@ function weeklyUpdate(weeks=1){
     const weeklyRaw = game.getWeeklyCost();
     const weeklyAdj = Math.round(weeklyRaw * (game.getExpenseMultiplier ? game.getExpenseMultiplier() : 1));
     game.recordExpense(weeklyAdj, '周维护费用');
+    const subsidyAmount = 10000 + (i + 1) * 10 * WEEKLY_SUBSIDY_BASE + 10 * (game.reputation * SUBSIDY_REP_BONUS);
+    game.budget += subsidyAmount;
+    log(`本周拨款发放：+¥${subsidyAmount} (含声誉奖励 ¥${game.reputation * SUBSIDY_REP_BONUS})`);
+      
+    if (i === 0) {
+        window.pushEvent && window.pushEvent({
+            name: '财政拨款',
+            description: `收到本周教育局补助 ¥${subsidyAmount}`,
+            week: game.week
+        });
+    }
     game.week++;
     game.updateWeather();
     
