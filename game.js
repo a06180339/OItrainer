@@ -761,13 +761,13 @@ function weeklyUpdate(weeks=1){
     const weeklyRaw = game.getWeeklyCost();
     const weeklyAdj = Math.round(weeklyRaw * (game.getExpenseMultiplier ? game.getExpenseMultiplier() : 1));
     game.recordExpense(weeklyAdj, '周维护费用');
-    let diffMultiplier = 0.25;
+    let diffMultiplier = 0.4;
     
     if (game.difficulty === 1) 
       diffMultiplier = 0.5; // 简单模式补助更多
     
     if (game.difficulty === 3) 
-      diffMultiplier = 0.1; // 困难模式补助更少
+      diffMultiplier = 0.3; // 困难模式补助更少
     
     const subsidyAmount = Math.floor(diffMultiplier * (10000 + (i + 1) * 10 * WEEKLY_SUBSIDY_BASE + (game.reputation * SUBSIDY_REP_BONUS)));
     game.budget += subsidyAmount;
@@ -824,6 +824,11 @@ function weeklyUpdate(weeks=1){
             }catch(e){ 
               console.error('检查晋级资格失败:', e); 
               hasQualification = true; // 出错时保守处理，不退队
+            }
+            const nextCompName = qualInfo.nextContest;
+          if(nextCompName === 'WC' || nextCompName === 'APIO') {
+        // 虽然没资格参加 WC，但可能能参加 NOIP，所以不能退队！
+          hasQualification = true; 
             }
             
             // 如果学生没有晋级资格，自动退队
