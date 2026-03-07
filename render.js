@@ -1613,7 +1613,9 @@ const CONTEST_VALUE_MAP = {
   'NOI': 8,
   'CTS': 0,
   'CTT': 0,
-  'IOI': 16
+  'IOI': 16,
+  'WC': 5,    // 新增：给 WC 设定权重（比 NOIP 高，比 NOI 低）
+  'APIO': 6
 };
 
 /**
