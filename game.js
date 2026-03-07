@@ -761,7 +761,15 @@ function weeklyUpdate(weeks=1){
     const weeklyRaw = game.getWeeklyCost();
     const weeklyAdj = Math.round(weeklyRaw * (game.getExpenseMultiplier ? game.getExpenseMultiplier() : 1));
     game.recordExpense(weeklyAdj, '周维护费用');
-    const subsidyAmount = 10000 + (i + 1) * 10 * WEEKLY_SUBSIDY_BASE + 10 * (game.reputation * SUBSIDY_REP_BONUS);
+    let diffMultiplier = 0.7;
+    
+    if (game.difficulty === 1) 
+      diffMultiplier = 1; // 简单模式补助更多
+    
+    if (game.difficulty === 3) 
+      diffMultiplier = 0.4; // 困难模式补助更少
+    
+    const subsidyAmount = Math.floor(diffMultiplier * (10000 + (i + 1) * 10 * WEEKLY_SUBSIDY_BASE + (game.reputation * SUBSIDY_REP_BONUS)));
     game.budget += subsidyAmount;
     log(`本周拨款发放：+¥${subsidyAmount} (含声誉奖励 ¥${game.reputation * SUBSIDY_REP_BONUS})`);
       
