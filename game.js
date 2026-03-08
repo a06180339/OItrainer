@@ -318,17 +318,17 @@ function trainStudentsWithTask(task, intensity) {
     
     const studentAbility = (s.thinking + s.coding) / 2.0;
     
-    const boostMultiplier = calculateBoostMultiplier(studentAbility, task.difficulty);
+    const boostMultiplier = 0.7 * calculateBoostMultiplier(studentAbility, task.difficulty);
     
     const results = applyTaskBoosts(s, task);
     
     const libraryLevel = game.facilities.library;
     let libraryBonus = 0;
-    if(libraryLevel === 1) libraryBonus = -0.20;
-    else if(libraryLevel === 2) libraryBonus = -0.05;
+    if(libraryLevel === 1) libraryBonus = 0;
+    else if(libraryLevel === 2) libraryBonus = 0.05;
     else if(libraryLevel === 3) libraryBonus = 0.10;
-    else if(libraryLevel === 4) libraryBonus = 0.12;
-    else if(libraryLevel === 5) libraryBonus = 0.14;
+    else if(libraryLevel === 4) libraryBonus = 0.15;
+    else if(libraryLevel === 5) libraryBonus = 0.2;
     
     const libraryMultiplier = 1.0 + libraryBonus;
     
@@ -337,7 +337,7 @@ function trainStudentsWithTask(task, intensity) {
     // 应用知识点增加：基础效率加成 + 图书馆加成 + 强度系数 + 生病惩罚
     for(const boost of results.boosts) {
       // 计算总的知识点增加（包含所有加成因素）
-      const totalBoost = Math.floor(boost.actualAmount * libraryMultiplier * intensityFactor * sick_penalty);
+      const totalBoost = Math.floor(0.7 * boost.actualAmount * libraryMultiplier * intensityFactor * sick_penalty);
       s.addKnowledge(boost.type, totalBoost);
       // 更新 actualAmount 为实际增加量，以便日志正确显示
       boost.actualAmount = totalBoost;
@@ -345,18 +345,18 @@ function trainStudentsWithTask(task, intensity) {
     
     const computerLevel = game.facilities.computer;
     let computerBonus = 0;
-    if(computerLevel === 1) computerBonus = -0.2;
-    else if(computerLevel === 2) computerBonus = 0;
+    if(computerLevel === 1) computerBonus = 0;
+    else if(computerLevel === 2) computerBonus = 0.05;
     else if(computerLevel === 3) computerBonus = 0.1;
-    else if(computerLevel === 4) computerBonus = 0.2;
-    else if(computerLevel === 5) computerBonus = 0.3;
+    else if(computerLevel === 4) computerBonus = 0.15;
+    else if(computerLevel === 5) computerBonus = 0.2;
     
     const computerMultiplier = 1.0 + computerBonus;
     
     const abilityGainBase = boostMultiplier * intensityFactor * (1 - Math.min(0.6, s.pressure/200.0));
-    const stateFactor = uniform(0.9, 1.8); // 随机波动：最差只有40%效果，最好有180%效果
-    const thinkingGain = uniform(0.8, 1.5) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
-    const codingGain = uniform(1.5, 2.5) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
+    const stateFactor = uniform(0.7, 1); // 随机波动：最差只有40%效果，最好有180%效果
+    const thinkingGain = uniform(0.8, 1) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
+    const codingGain = uniform(1.5, 2) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
     
     s.thinking += thinkingGain;
     s.coding += codingGain;
@@ -372,8 +372,8 @@ function trainStudentsWithTask(task, intensity) {
     else if(intensity===2) base_pressure *= TRAINING_PRESSURE_MULTIPLIER_MEDIUM;
     
     let canteen_reduction = game.facilities.getCanteenPressureReduction();
-    let pressure_increase = base_pressure * weather_factor * canteen_reduction * comfort_factor * uniform(0.1, 0.3);
-    if(s.sick_weeks > 0) pressure_increase += 10;
+    let pressure_increase = base_pressure * weather_factor * canteen_reduction * comfort_factor * uniform(0.18, 0.22);
+    if(s.sick_weeks > 0) pressure_increase += 5;
     
     pressure_increase *= (typeof PRESSURE_INCREASE_MULTIPLIER !== 'undefined' ? PRESSURE_INCREASE_MULTIPLIER : 1.0);
     
@@ -583,18 +583,18 @@ function outingTrainingWithSelection(difficulty_choice, province_choice, selecte
 
     const outfitEffectMult = (typeof OUTFIT_EFFECT_MULTIPLIER !== 'undefined' ? OUTFIT_EFFECT_MULTIPLIER : 1.0);
     const knowledge_gain = Math.floor(uniformInt(knowledge_min, knowledge_max) * knowledge_modifier * outfitEffectMult);
-    s.knowledge_ds += knowledge_gain; 
-    s.knowledge_graph += knowledge_gain; 
-    s.knowledge_string += knowledge_gain; 
-    s.knowledge_math += knowledge_gain; 
-    s.knowledge_dp += knowledge_gain;
+    s.knowledge_ds += uniform(0.5, 0.9) * knowledge_gain; 
+    s.knowledge_graph += uniform(0.5, 0.9) * knowledge_gain; 
+    s.knowledge_string += uniform(0.5, 0.9) * knowledge_gain; 
+    s.knowledge_math += uniform(0.5, 0.9) * knowledge_gain; 
+    s.knowledge_dp += uniform(0.5, 0.9) *  knowledge_gain;
     
-    const ability_gain = uniform(ability_min, ability_max) * ability_modifier * outfitEffectMult;
+    const ability_gain = uniform(0.6, 0.9) * uniform(ability_min, ability_max) * ability_modifier * outfitEffectMult;
     s.thinking = (s.thinking || 0) + ability_gain;
     s.coding = (s.coding || 0) + ability_gain;
     s.mental = Math.min(100, s.mental + ability_gain * 0.5);
 
-    const pressure_delta = Math.floor(pressure_gain * (mismatch ? pressure_multiplier : 1.0) * (typeof PRESSURE_INCREASE_MULTIPLIER !== 'undefined' ? PRESSURE_INCREASE_MULTIPLIER : 1.0));
+    const pressure_delta = uniform(0.5, 0.9) * Math.floor(pressure_gain * (mismatch ? pressure_multiplier : 1.0) * (typeof PRESSURE_INCREASE_MULTIPLIER !== 'undefined' ? PRESSURE_INCREASE_MULTIPLIER : 1.0));
     s.pressure = Math.min(100, Number(s.pressure||0) + pressure_delta);
     s.comfort -= 10;
 
