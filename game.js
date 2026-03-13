@@ -469,6 +469,96 @@ function simulateHiddenMockScore(s, diffIdx){
   return total;
 }
 
+function selfStudyUI() {
+    if (!confirm("安排全队进行为期一周的自习吗？\n效果：提升思维与代码能力，并自动补强每个学生最弱的两项知识。")) return;
+    
+    log("学生们开始了为期一周的自习...");
+    const __before = typeof __createSnapshot === 'function' ? __createSnapshot() : null;
+
+    game.students.forEach(s => {
+        if (!s || s.active === false) return;
+
+        // 1. 提升基础能力 (数值比专项训练略低)
+        const gainThinking = uniform(0.5, 1.2);
+        const gainCoding = uniform(0.8, 1.5);
+        s.addThinking(gainThinking);
+        s.addCoding(gainCoding);
+
+        // 2. 补齐短板：提升最低的两个知识点
+        let kpts = [
+            { key: 'knowledge_ds', val: s.knowledge_ds, name: '数据结构' },
+            { key: 'knowledge_graph', val: s.knowledge_graph, name: '图论' },
+            { key: 'knowledge_string', val: s.knowledge_string, name: '字符串' },
+            { key: 'knowledge_math', val: s.knowledge_math, name: '数学' },
+            { key: 'knowledge_dp', val: s.knowledge_dp, name: '动态规划' }
+        ];
+
+        // 按数值升序排列，取前两个
+        kpts.sort((a, b) => a.val - b.val);
+        
+        const boostAmount = uniformInt(4, 7); // 提升幅度
+        s.addKnowledge(kpts[0].name, boostAmount);
+        s.addKnowledge(kpts[1].name, boostAmount);
+
+        // 3. 压力增加 (自习压力较小)
+        const pressureAdd = base_pressure_selfstudy = 10 * game.getWeatherFactor();
+        s.pressure = Math.min(100, s.pressure + pressureAdd);
+    });
+
+    // 推进一周
+    safeWeeklyUpdate(1);
+    
+    const __after = typeof __createSnapshot === 'function' ? __createSnapshot() : null;
+    if(__before && __after) __summarizeSnapshot(__before, __after, "全员自习");
+    
+    renderAll();
+}
+
+function selfStudyUI() {
+    if (!confirm("安排全队进行为期一周的自习吗？\n效果：提升思维与代码能力，并自动补强每个学生最弱的两项知识。")) return;
+    
+    log("学生们开始了为期一周的自习...");
+    const __before = typeof __createSnapshot === 'function' ? __createSnapshot() : null;
+
+    game.students.forEach(s => {
+        if (!s || s.active === false) return;
+
+        // 1. 提升基础能力 (数值比专项训练略低)
+        const gainThinking = uniform(0.5, 1.2);
+        const gainCoding = uniform(0.8, 1.5);
+        s.addThinking(gainThinking);
+        s.addCoding(gainCoding);
+
+        // 2. 补齐短板：提升最低的两个知识点
+        let kpts = [
+            { key: 'knowledge_ds', val: s.knowledge_ds, name: '数据结构' },
+            { key: 'knowledge_graph', val: s.knowledge_graph, name: '图论' },
+            { key: 'knowledge_string', val: s.knowledge_string, name: '字符串' },
+            { key: 'knowledge_math', val: s.knowledge_math, name: '数学' },
+            { key: 'knowledge_dp', val: s.knowledge_dp, name: '动态规划' }
+        ];
+
+        // 按数值升序排列，取前两个
+        kpts.sort((a, b) => a.val - b.val);
+        
+        const boostAmount = uniformInt(4, 7); // 提升幅度
+        s.addKnowledge(kpts[0].name, boostAmount);
+        s.addKnowledge(kpts[1].name, boostAmount);
+
+        // 3. 压力增加 (自习压力较小)
+        const pressureAdd = base_pressure_selfstudy = 10 * game.getWeatherFactor();
+        s.pressure = Math.min(100, s.pressure + pressureAdd);
+    });
+
+    // 推进一周
+    safeWeeklyUpdate(1);
+    
+    const __after = typeof __createSnapshot === 'function' ? __createSnapshot() : null;
+    if(__before && __after) __summarizeSnapshot(__before, __after, "全员自习");
+    
+    renderAll();
+}
+
 function computeOutingCostQuadratic(difficulty_choice, province_choice, participantCount){
   const DIFF_COST_PENALTY = {1:100, 2:300, 3:600};
   const base = (difficulty_choice === 2) ? OUTFIT_BASE_COST_INTERMEDIATE : 
@@ -1478,6 +1568,8 @@ window.onload = ()=>{
     document.getElementById('action-mock').onclick = ()=>{ holdMockContestUI(); };
     document.getElementById('action-outing').onclick = ()=>{ outingTrainingUI(); };
     document.getElementById('action-resign').onclick = ()=>{ resignUI(); };
+    const selfStudyBtn = document.getElementById('action-selfstudy');
+    if(selfStudyBtn) selfStudyBtn.onclick = () => { selfStudyUI(); };
     
     document.querySelectorAll('.btn.upgrade').forEach(b => {
       b.onclick = (e) => {
