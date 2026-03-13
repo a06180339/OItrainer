@@ -1567,6 +1567,7 @@ window.onload = ()=>{
     document.getElementById('action-entertain').onclick = ()=>{ entertainmentUI(); };
     document.getElementById('action-mock').onclick = ()=>{ holdMockContestUI(); };
     document.getElementById('action-outing').onclick = ()=>{ outingTrainingUI(); };
+    document.getElementById('action-upgrade-facilities').onclick = () => { showFacilityUpgradeModal(); };
     document.getElementById('action-resign').onclick = ()=>{ resignUI(); };
     const selfStudyBtn = document.getElementById('action-selfstudy');
     if(selfStudyBtn) selfStudyBtn.onclick = () => { selfStudyUI(); };
