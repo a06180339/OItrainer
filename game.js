@@ -318,7 +318,7 @@ function trainStudentsWithTask(task, intensity) {
     
     const studentAbility = (s.thinking + s.coding) / 2.0;
     
-    const boostMultiplier = 0.7 * calculateBoostMultiplier(studentAbility, task.difficulty);
+    const boostMultiplier = 0.45 * calculateBoostMultiplier(studentAbility, task.difficulty);
     
     const results = applyTaskBoosts(s, task);
     
@@ -337,7 +337,7 @@ function trainStudentsWithTask(task, intensity) {
     // 应用知识点增加：基础效率加成 + 图书馆加成 + 强度系数 + 生病惩罚
     for(const boost of results.boosts) {
       // 计算总的知识点增加（包含所有加成因素）
-      const totalBoost = Math.floor(0.7 * boost.actualAmount * libraryMultiplier * intensityFactor * sick_penalty);
+      const totalBoost = Math.floor(0.6 * boost.actualAmount * libraryMultiplier * intensityFactor * sick_penalty);
       s.addKnowledge(boost.type, totalBoost);
       // 更新 actualAmount 为实际增加量，以便日志正确显示
       boost.actualAmount = totalBoost;
@@ -354,7 +354,7 @@ function trainStudentsWithTask(task, intensity) {
     const computerMultiplier = 1.0 + computerBonus;
     
     const abilityGainBase = boostMultiplier * intensityFactor * (1 - Math.min(0.6, s.pressure/200.0));
-    const stateFactor = uniform(0.7, 1); // 随机波动：最差只有40%效果，最好有180%效果
+    const stateFactor = uniform(0.4, 0.6); // 随机波动：最差只有40%效果，最好有180%效果
     const thinkingGain = uniform(0.8, 1) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
     const codingGain = uniform(1.5, 2) * abilityGainBase * computerMultiplier * stateFactor * (typeof TRAINING_EFFECT_MULTIPLIER !== 'undefined' ? TRAINING_EFFECT_MULTIPLIER : 1.0);
     
@@ -1372,16 +1372,16 @@ function initGame(difficulty, province_choice, student_count){
     }
     let mean = (min_val + max_val) / 2;
     let stddev = (max_val - min_val);
-    let thinking = clamp(normal(mean * uniform(0.9, 1.1), stddev), 5, 100);
-    let coding = clamp(normal(mean * uniform(0.9, 1.1), stddev), 5, 100);
-    let mental = clamp(normal(mean * uniform(0.9, 1.1), stddev), 5, 100);
+    let thinking = clamp(normal(mean * uniform(1.2, 1.7), stddev), 5, 140);
+    let coding = clamp(normal(mean * uniform(1.2, 1.7), stddev), 5, 140);
+    let mental = clamp(normal(mean * uniform(1.2, 1.7), stddev), 5, 140);
     const newStud = new Student(name, thinking, coding, mental);
     const base = KNOWLEDGE_ABLILTY_START;
-    newStud.knowledge_ds     = clampInt(normal(base, 5), 0, 40);
-    newStud.knowledge_graph  = clampInt(normal(base, 5), 0, 40);
-    newStud.knowledge_string = clampInt(normal(base, 5), 0, 40);
-    newStud.knowledge_math   = clampInt(normal(base, 5), 0, 40);
-    newStud.knowledge_dp     = clampInt(normal(base, 5), 0, 40);
+    newStud.knowledge_ds     = clampInt(2.5 * normal(base, 5), 40, 100);
+    newStud.knowledge_graph  = clampInt(2.5 * normal(base, 5), 40, 100);
+    newStud.knowledge_string = clampInt(2.5 * normal(base, 5), 40, 100);
+    newStud.knowledge_math   = clampInt(2.5 * normal(base, 5), 40, 100);
+    newStud.knowledge_dp     = clampInt(2.5 * normal(base, 5), 40, 100);
     try{ if(window.TalentManager && typeof window.TalentManager.assignInitialTalent === 'function') window.TalentManager.assignInitialTalent(newStud); }catch(e){}
     game.students.push(newStud);
   }
