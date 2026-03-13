@@ -769,7 +769,7 @@ function weeklyUpdate(weeks=1){
     if (game.difficulty === 3) 
       diffMultiplier = 0.3; // 困难模式补助更少
     
-    const subsidyAmount = Math.floor(diffMultiplier * (10000 + (i + 1) * 10 * WEEKLY_SUBSIDY_BASE + (game.reputation * SUBSIDY_REP_BONUS)));
+    const subsidyAmount = Math.floor(0.65 * diffMultiplier * (10000 + (i + 1) * 10 * WEEKLY_SUBSIDY_BASE + (game.reputation * SUBSIDY_REP_BONUS)));
     game.budget += subsidyAmount;
     log(`本周拨款发放：+¥${subsidyAmount} (含声誉奖励 ¥${game.reputation * SUBSIDY_REP_BONUS})`);
       
