@@ -1377,11 +1377,11 @@ function initGame(difficulty, province_choice, student_count){
     let mental = clamp(normal(mean * uniform(1.2, 1.7), stddev), 5, 140);
     const newStud = new Student(name, thinking, coding, mental);
     const base = KNOWLEDGE_ABLILTY_START;
-    newStud.knowledge_ds     = clampInt(2.5 * normal(base, 5), 40, 100);
-    newStud.knowledge_graph  = clampInt(2.5 * normal(base, 5), 40, 100);
-    newStud.knowledge_string = clampInt(2.5 * normal(base, 5), 40, 100);
-    newStud.knowledge_math   = clampInt(2.5 * normal(base, 5), 40, 100);
-    newStud.knowledge_dp     = clampInt(2.5 * normal(base, 5), 40, 100);
+    newStud.knowledge_ds     = clampInt(2.5 * normal(base, 5), 40, 80);
+    newStud.knowledge_graph  = clampInt(2.5 * normal(base, 5), 40, 80);
+    newStud.knowledge_string = clampInt(2.5 * normal(base, 5), 40, 80);
+    newStud.knowledge_math   = clampInt(2.5 * normal(base, 5), 40, 80);
+    newStud.knowledge_dp     = clampInt(2.5 * normal(base, 5), 40, 80);
     try{ if(window.TalentManager && typeof window.TalentManager.assignInitialTalent === 'function') window.TalentManager.assignInitialTalent(newStud); }catch(e){}
     game.students.push(newStud);
   }
